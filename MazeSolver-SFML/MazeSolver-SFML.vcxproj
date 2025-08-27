@@ -21,9 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{781c0c83-330e-43ee-8add-d2263af954c3}</ProjectGuid>
+    <ProjectGuid>{B739FC33-459B-4089-926A-6E14B13CF1ED}</ProjectGuid>
     <RootNamespace>MazeSolverSMFL</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>MazeSolver-SFML</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
