@@ -1,16 +1,16 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
-
-using namespace sf;
+#include "Cell.hpp"
 
 class Maze {
-public:
-	Maze(int cols, int rows, int cellSize);
-	void generate();						// generate the maze
-	void draw(RenderWindow& window);	// draws the maze
-
 private:
-	int _cols, _rows, _cellSize;
+    int _cols, _rows, _cellSize;
+    std::vector<std::vector<Cell>> _grid; // 2D grid of cells
 
+public:
+    Maze(int cols, int rows, int cellSize);
+
+    void draw();
+    Cell& getCell(int x, int y);
 };

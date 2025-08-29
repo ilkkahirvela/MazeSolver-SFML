@@ -7,5 +7,10 @@ using namespace sf;
 int main()
 {
     Maze maze(9, 9, 40);
-    maze.generate();
+
+    maze.draw();
+
+
+
+    return 0;
 }

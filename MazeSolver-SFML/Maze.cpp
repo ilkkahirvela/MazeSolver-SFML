@@ -1,63 +1,59 @@
 #include "Maze.hpp"
+#include "Cell.hpp"
+#include <SFML/Graphics/Color.hpp>
 
-using namespace std;
-using namespace sf;
+Maze::Maze(int cols, int rows, int cellSize)
+    : _cols(cols), _rows(rows), _cellSize(cellSize)
+{
+    _grid.resize(_rows);
 
-Maze::Maze(int cols, int rows, int cellSize) 
-	: _cols(cols), _rows(rows), _cellSize(cellSize) {}
+    for (int y = 0; y < _rows; y++) {
+        _grid[y].reserve(_cols);
 
-// Algorithm for generating the maze
-void Maze::generate() {
+        for (int x = 0; x < _cols; x++) {
+            _grid[y].emplace_back(x, y, _cellSize);
 
-	// Create the main window
-    RenderWindow window(VideoMode(Vector2u(_cols * _cellSize, _rows * _cellSize), 32), "Maze skeleton");
+            // Example: Color pattern based on position
+            if ((x + y) % 2 == 0)
+                _grid[y][x].setBlocked(false); // white cell
+            else
+                _grid[y][x].setBlocked(true);  // black cell
 
-    // Base cell shape (color will be changed per cell)
-    RectangleShape cellShape({ (float)_cellSize - 2, (float)_cellSize - 2 });
-    cellShape.setFillColor(Color::Black);
-    cellShape.setOutlineThickness(1.5f);
+            // Or add more colors
+            if ((x + y) % 5 == 0)
+                _grid[y][x].shape.setFillColor(sf::Color::Green);
+            else if ((x + y) % 7 == 0)
+                _grid[y][x].shape.setFillColor(sf::Color::Blue);
+        }
+    }
+}
 
-    while (window.isOpen())
-    {
-        while (const optional event = window.pollEvent())
+void Maze::draw() {
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(_cols * _cellSize, _rows * _cellSize)), "Maze Skeleton");
+    window.setFramerateLimit(60);
+
+    while (window.isOpen()) {
+        while (const std::optional event = window.pollEvent())
         {
-            if (event->is<Event::Closed>())
+            // Request for closing the window
+            if (event->is<sf::Event::Closed>())
                 window.close();
         }
 
-        // Clear the window with white background
-        window.clear(Color::White);
+        window.clear(sf::Color::White);
 
-        // Draw the grid
-        for (int y = 0; y < _rows; y++)
-        {
-            for (int x = 0; x < _cols; x++)
-            {
-				// Example: skip column 4 and leave a white gap in the maze
-                if (x == 4) {
-                    continue;
-                }
-
-                // Check if cell is on the border
-                if (x == 0 || y == 0 || x == _cols - 1 || y == _rows - 1) {
-                    cellShape.setOutlineColor(Color::Red); // border color
-                }
-                else {
-                    cellShape.setOutlineColor(Color::Green); // inner cells
-                }
-
-                Vector2f position((float)(x * _cellSize + 1), (float)(y * _cellSize + 1));
-                cellShape.setPosition(position);
-                window.draw(cellShape);
+        for (int y = 0; y < _rows; y++) {
+            for (int x = 0; x < _cols; x++) {
+                _grid[y][x].draw(window);
             }
         }
 
         window.display();
-    }
 
+    }
 }
 
-// Drawing code
-void Maze::draw(RenderWindow& window) {
 
+Cell& Maze::getCell(int x, int y) {
+    return _grid[y][x];
 }

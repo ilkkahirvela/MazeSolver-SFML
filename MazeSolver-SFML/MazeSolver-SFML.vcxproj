@@ -133,10 +133,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="Maze.cpp" />
     <ClCompile Include="Solver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cell.hpp" />
     <ClInclude Include="Maze.hpp" />
     <ClInclude Include="Solver.hpp" />
   </ItemGroup>
