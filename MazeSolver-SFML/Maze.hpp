@@ -4,13 +4,17 @@
 #include "Cell.hpp"
 
 class Maze {
-private:
-    int _cols, _rows, _cellSize;
-    std::vector<std::vector<Cell>> _grid; // 2D grid of cells
-
 public:
     Maze(int cols, int rows, int cellSize);
 
+    void generate();
     void draw();
     Cell& getCell(int x, int y);
+    std::vector<std::vector<Cell>>& getGrid() { return _grid; }
+    int getRows() const { return _rows; }
+    int getCols() const { return _cols; }
+
+private:
+    int _cols, _rows, _cellSize;
+    std::vector<std::vector<Cell>> _grid; // 2D grid of cells
 };

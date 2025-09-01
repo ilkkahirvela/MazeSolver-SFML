@@ -13,7 +13,7 @@ public:
     // Visuals
     sf::RectangleShape shape;
 
-    Cell(int x, int y, int size, bool blocked = true);
+    Cell(int x, int y, int size, bool blocked = false);
 
     void setBlocked(bool blocked);
     void setVisited(bool visited);
