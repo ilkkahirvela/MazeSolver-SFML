@@ -8,7 +8,7 @@ public:
     Maze(int cols, int rows, int cellSize);
 
     void generate();
-    void draw();
+    void draw(sf::RenderWindow& window);
     Cell& getCell(int x, int y);
     std::vector<std::vector<Cell>>& getGrid() { return _grid; }
     int getRows() const { return _rows; }

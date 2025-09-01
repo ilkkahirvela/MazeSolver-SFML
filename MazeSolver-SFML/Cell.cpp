@@ -18,7 +18,8 @@ void Cell::setBlocked(bool blocked) {
     }
     else {
         shape.setFillColor(sf::Color::White);
-        shape.setOutlineColor(sf::Color(200, 200, 200));
+        shape.setOutlineColor(sf::Color::White);
+        // shape.setOutlineColor(sf::Color(200, 200, 200));
     }
 }
 

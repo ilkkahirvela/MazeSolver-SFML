@@ -18,12 +18,11 @@ Maze::Maze(int cols, int rows, int cellSize)
         for (int x = 0; x < _cols; x++) {
             _grid[y].emplace_back(x, y, _cellSize);
             _grid[y][x].setBlocked(true); // default all to blocked
-            _grid[y][x].shape.setOutlineColor(sf::Color::Red);
+            _grid[y][x].shape.setOutlineColor(sf::Color::Black);
         }
     }
 }
 
-// Calculative generation
 void Maze::generate() {
     // --- DFS MAZE (recursive backtracker) on a tile grid ---
     // Uses odd (x,y) as "rooms" and carves walls between them.
@@ -101,31 +100,13 @@ void Maze::generate() {
 }
 
 // Displaying the maze
-void Maze::draw() {
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(_cols * _cellSize, _rows * _cellSize)), "Maze Skeleton");
-    window.setFramerateLimit(60);
-
-    while (window.isOpen()) {
-        while (const std::optional event = window.pollEvent())
-        {
-            // Request for closing the window
-            if (event->is<sf::Event::Closed>())
-                window.close();
+void Maze::draw(sf::RenderWindow& window) {
+    for (int y = 0; y < _rows; y++) {
+        for (int x = 0; x < _cols; x++) {
+            _grid[y][x].draw(window);
         }
-
-        window.clear(sf::Color::White);
-
-        for (int y = 0; y < _rows; y++) {
-            for (int x = 0; x < _cols; x++) {
-                _grid[y][x].draw(window);
-            }
-        }
-
-        window.display();
-
     }
 }
-
 
 Cell& Maze::getCell(int x, int y) {
     return _grid[y][x];
