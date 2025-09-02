@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
-    const int cols = 75, rows = 75, cellSize = 12;
+    const int cols = 75, rows = 75, cellSize = 6;
 
     sf::RenderWindow window(
         sf::VideoMode(sf::Vector2u(cols * cellSize, rows * cellSize)),
@@ -18,9 +18,12 @@ int main() {
 
     // animation timing
     sf::Clock clock;
-    const float pathStepMs = 0.1f;
+    const int stepMs = 1.f; // smaller -> faster animation
+    std::size_t visitedIndex = 0;
     std::size_t pathIndex = 0;
-    auto path = std::shared_ptr<const std::vector<Cell*>>(nullptr);
+
+    std::vector<Cell*> visitedSnapshot;
+    std::shared_ptr<const std::vector<Cell*>> pathPtr;
 
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
@@ -28,17 +31,34 @@ int main() {
                 window.close();
         }
 
-        // grab path once solver finished
-        if (!path && solver.isFinished() && solver.foundPath()) {
-            path = solver.getPath();
+        // pull a fresh snapshot of visited cells (copy) each frame
+        auto currentVisited = solver.getVisited();
+
+        // animate newly discovered visited cells, one (or more) per tick
+        if (visitedIndex < currentVisited.size()) {
+            if (clock.getElapsedTime().asMilliseconds() >= stepMs) {
+                // color a small batch per tick if you want faster coloring:
+                int batch = 1; // increase to color more per frame
+                for (int b = 0; b < batch && visitedIndex < currentVisited.size(); ++b, ++visitedIndex) {
+                    currentVisited[visitedIndex]->shape.setFillColor(sf::Color(150, 200, 255)); // light blue
+                    currentVisited[visitedIndex]->shape.setOutlineColor(sf::Color(150, 200, 255)); // light blue
+                }
+                clock.restart();
+            }
+        }
+
+        // once solver finished and path exists, start animating path (overwrites visited color)
+        if (solver.isFinished() && solver.foundPath() && !pathPtr) {
+            pathPtr = solver.getPath();
             pathIndex = 0;
             clock.restart();
         }
 
-        // animate path coloring
-        if (path && pathIndex < path->size()) {
-            if (clock.getElapsedTime().asMilliseconds() >= pathStepMs) {
-                (*path)[pathIndex]->shape.setFillColor(sf::Color::Green);
+        if (pathPtr && pathIndex < pathPtr->size()) {
+            if (clock.getElapsedTime().asMilliseconds() >= stepMs) {
+                // color path cells gradually
+                (*pathPtr)[pathIndex]->shape.setFillColor(sf::Color::Red);
+                (*pathPtr)[pathIndex]->shape.setOutlineColor(sf::Color::Red);
                 ++pathIndex;
                 clock.restart();
             }
@@ -49,6 +69,6 @@ int main() {
         window.display();
     }
 
-    solver.join(); // clean shutdown
+    solver.join();
     return 0;
 }

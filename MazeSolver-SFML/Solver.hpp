@@ -11,12 +11,15 @@ public:
     explicit Solver(Maze& maze);
 
     void start();                // run BFS in a background thread
-    void join();                 // clean up
+    void join();                 // clean up / wait
     bool isFinished() const { return _finished.load(); }
     bool foundPath()   const { return _found.load(); }
 
-    // returns shared path
+    // returns shared path (nullptr until available)
     std::shared_ptr<const std::vector<Cell*>> getPath() const;
+
+    // returns a copy of visited cells so caller can safely iterate
+    std::vector<Cell*> getVisited() const;
 
 private:
     void run();                  // BFS implementation
@@ -27,5 +30,6 @@ private:
     std::atomic<bool> _found{ false };
 
     mutable std::mutex _mtx;
-    std::shared_ptr<std::vector<Cell*>> _path; // set once on success
+    std::shared_ptr<std::vector<Cell*>> _path;    // set once on success (immutable thereafter)
+    std::shared_ptr<std::vector<Cell*>> _visited; // appended-to while running
 };
