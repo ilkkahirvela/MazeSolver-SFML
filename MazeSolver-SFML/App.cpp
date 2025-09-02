@@ -18,7 +18,7 @@ int main() {
 
     // animation timing
     sf::Clock clock;
-    const int stepMs = 0.0001f; // ms per animation step
+    const int stepMs = 0.1f; // ms per animation step
     std::size_t visitedIndex = 0;
     std::size_t pathIndex = 0;
 
