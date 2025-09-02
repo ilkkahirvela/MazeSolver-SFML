@@ -1,82 +1,74 @@
 ﻿#include "Solver.hpp"
+#include <queue>
+#include <map>
 #include <algorithm>
 
-static const std::pair<int, int> DIRS4[4] = {
-    {1,0}, {-1,0}, {0,1}, {0,-1}
-};
+static const std::pair<int, int> DIRS4[4] = { {1,0},{-1,0},{0,1},{0,-1} };
 
 Solver::Solver(Maze& maze) : _maze(maze) {}
 
-bool Solver::step() {
-    if (_finished) return true;
-
-    auto& grid = _maze.getGrid();
-    int rows = _maze.getRows();
-    int cols = _maze.getCols();
-
-    // First call → find start/goal + init queue
-    if (!_initialized) {
-        int startX = -1;
-        for (int x = 0; x < cols; ++x) {
-            if (!grid[0][x].isBlocked) { startX = x; break; }
-        }
-        int goalX = -1;
-        for (int x = 0; x < cols; ++x) {
-            if (!grid[rows - 1][x].isBlocked) { goalX = x; break; }
-        }
-        if (startX == -1 || goalX == -1) {
-            _finished = true;
-            return true;
-        }
-
-        _start = { startX, 0 };
-        _goal = { goalX, rows - 1 };
-        _q.push(_start);
-        _parent[_start] = { -1,-1 };
-        _initialized = true;
-    }
-
-    if (_q.empty()) {
-        _finished = true;
-        return true;
-    }
-
-    auto [cx, cy] = _q.front(); _q.pop();
-
-    // Color visited nodes
-    grid[cy][cx].shape.setFillColor(sf::Color(100, 150, 255));
-
-    if (cx == _goal.first && cy == _goal.second) {
-        _finished = true;
-        _found = true;
-        return true;
-    }
-
-    for (auto [dx, dy] : DIRS4) {
-        int nx = cx + dx, ny = cy + dy;
-        if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) continue;
-        if (grid[ny][nx].isBlocked) continue;
-
-        if (!_parent.count({ nx, ny })) {
-            _parent[{nx, ny}] = { cx, cy };
-            _q.push({ nx, ny });
-        }
-    }
-
-    return false;
+void Solver::start() {
+    _thread = std::thread([this] { run(); });
 }
 
-std::vector<Cell*> Solver::getPath() {
-    std::vector<Cell*> path;
-    if (!_found) return path;
+void Solver::join() {
+    if (_thread.joinable()) _thread.join();
+}
 
+void Solver::run() {
     auto& grid = _maze.getGrid();
-    auto cur = _goal;
+    const int rows = _maze.getRows();
+    const int cols = _maze.getCols();
 
-    while (cur.first != -1) {
-        path.push_back(&grid[cur.second][cur.first]);
-        cur = _parent[cur];
+    int startX = -1, goalX = -1;
+    for (int x = 0; x < cols; ++x) if (!grid[0][x].isBlocked) { startX = x; break; }
+    for (int x = 0; x < cols; ++x) if (!grid[rows - 1][x].isBlocked) { goalX = x; break; }
+    if (startX == -1 || goalX == -1) { _finished = true; return; }
+
+    const std::pair<int, int> start{ startX,0 };
+    const std::pair<int, int> goal{ goalX,rows - 1 };
+
+    std::queue<std::pair<int, int>> q;
+    std::map<std::pair<int, int>, std::pair<int, int>> parent;
+
+    q.push(start);
+    parent[start] = { -1,-1 };
+
+    bool found = false;
+
+    while (!q.empty()) {
+        auto [cx, cy] = q.front(); q.pop();
+        if (cx == goal.first && cy == goal.second) { found = true; break; }
+
+        for (auto [dx, dy] : DIRS4) {
+            int nx = cx + dx, ny = cy + dy;
+            if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) continue;
+            if (grid[ny][nx].isBlocked) continue;
+            if (!parent.count({ nx,ny })) {
+                parent[{nx, ny}] = { cx,cy };
+                q.push({ nx,ny });
+            }
+        }
     }
-    std::reverse(path.begin(), path.end());
-    return path;
+
+    if (found) {
+        std::vector<Cell*> path;
+        auto cur = goal;
+        while (cur.first != -1) {
+            path.push_back(&grid[cur.second][cur.first]);
+            cur = parent[cur];
+        }
+        std::reverse(path.begin(), path.end());
+
+        std::lock_guard<std::mutex> lock(_mtx);
+        _path = std::make_shared<std::vector<Cell*>>(std::move(path));
+        _found = true;
+    }
+
+    _finished = true;
+}
+
+std::shared_ptr<const std::vector<Cell*>> Solver::getPath() const {
+    std::lock_guard<std::mutex> lock(_mtx);
+    return _path;
 }

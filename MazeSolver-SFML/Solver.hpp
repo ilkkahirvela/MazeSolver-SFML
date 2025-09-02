@@ -1,32 +1,31 @@
 #pragma once
 #include "Maze.hpp"
-#include <queue>
-#include <map>
-#include <utility>
 #include <vector>
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <atomic>
 
 class Solver {
 public:
-    Solver(Maze& maze);
+    explicit Solver(Maze& maze);
 
-    // Run one BFS step
-    bool step();
+    void start();                // run BFS in a background thread
+    void join();                 // clean up
+    bool isFinished() const { return _finished.load(); }
+    bool foundPath()   const { return _found.load(); }
 
-    // Once BFS finishes, reconstruct path
-    std::vector<Cell*> getPath();
-
-    bool isFinished() const { return _finished; }
-    bool foundPath() const { return _found; }
+    // returns shared path
+    std::shared_ptr<const std::vector<Cell*>> getPath() const;
 
 private:
+    void run();                  // BFS implementation
+
     Maze& _maze;
-    std::queue<std::pair<int, int>> _q;
-    std::map<std::pair<int, int>, std::pair<int, int>> _parent;
+    std::thread _thread;
+    std::atomic<bool> _finished{ false };
+    std::atomic<bool> _found{ false };
 
-    std::pair<int, int> _start;
-    std::pair<int, int> _goal;
-
-    bool _initialized = false;
-    bool _finished = false;
-    bool _found = false;
+    mutable std::mutex _mtx;
+    std::shared_ptr<std::vector<Cell*>> _path; // set once on success
 };

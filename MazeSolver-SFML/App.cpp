@@ -2,44 +2,53 @@
 #include "Solver.hpp"
 #include <SFML/Graphics.hpp>
 
-int main()
-{
-    int cols = 75;
-    int rows = 75;
-    int cellSize = 12;
+int main() {
+    const int cols = 75, rows = 75, cellSize = 12;
 
-    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(cols * cellSize, rows * cellSize)), "Maze Solver");
-    window.setFramerateLimit(300);
-    int stepsPerFrame = 3;
+    sf::RenderWindow window(
+        sf::VideoMode(sf::Vector2u(cols * cellSize, rows * cellSize)),
+        "Maze Solver"
+    );
 
     Maze maze(cols, rows, cellSize);
     maze.generate();
-    
+
     Solver solver(maze);
+    solver.start();
+
+    // animation timing
+    sf::Clock clock;
+    const float pathStepMs = 0.1f;
+    std::size_t pathIndex = 0;
+    auto path = std::shared_ptr<const std::vector<Cell*>>(nullptr);
 
     while (window.isOpen()) {
-        while (const std::optional event = window.pollEvent())
-        {
-            // Request for closing the window
+        while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
 
-        // Run BFS animation
-        if (!solver.isFinished()) {
-            for (int i = 0; i < stepsPerFrame && !solver.isFinished(); ++i) {
-                solver.step();
-            }
+        // grab path once solver finished
+        if (!path && solver.isFinished() && solver.foundPath()) {
+            path = solver.getPath();
+            pathIndex = 0;
+            clock.restart();
         }
-        else if (solver.foundPath()) {
-            // Once BFS is done, color the path green
-            for (auto* cell : solver.getPath()) {
-                cell->shape.setFillColor(sf::Color::Green);
+
+        // animate path coloring
+        if (path && pathIndex < path->size()) {
+            if (clock.getElapsedTime().asMilliseconds() >= pathStepMs) {
+                (*path)[pathIndex]->shape.setFillColor(sf::Color::Green);
+                ++pathIndex;
+                clock.restart();
             }
         }
 
         window.clear(sf::Color::White);
-        maze.draw(window);   // <- draw maze and solver’s progress
+        maze.draw(window);
         window.display();
     }
+
+    solver.join(); // clean shutdown
+    return 0;
 }
