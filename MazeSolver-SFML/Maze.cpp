@@ -100,10 +100,10 @@ void Maze::generate() {
 }
 
 // Displaying the maze
-void Maze::draw(sf::RenderWindow& window) {
+void Maze::draw(sf::RenderTarget& target) {
     for (int y = 0; y < _rows; y++) {
         for (int x = 0; x < _cols; x++) {
-            _grid[y][x].draw(window);
+            _grid[y][x].draw(target);
         }
     }
 }

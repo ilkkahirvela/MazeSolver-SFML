@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
-    const int cols = 75, rows = 75, cellSize = 12;
+    const int cols = 111, rows = 111, cellSize = 8;
 
     sf::RenderWindow window(
         sf::VideoMode(sf::Vector2u(cols * cellSize, rows * cellSize)),
@@ -16,13 +16,19 @@ int main() {
     Solver solver(maze);
     solver.start();
 
+    // --- STATIC LAYER: draw maze once into a texture ---
+    sf::RenderTexture staticLayer({ cols * cellSize, rows * cellSize });
+    staticLayer.clear(sf::Color::White);
+    maze.draw(staticLayer);   // draw entire maze once
+    staticLayer.display();
+    sf::Sprite mazeBackground(staticLayer.getTexture());
+
     // animation timing
     sf::Clock clock;
-    const int stepMs = 0.1f; // ms per animation step
+    const int stepMs = 1; // ms per animation step
     std::size_t visitedIndex = 0;
     std::size_t pathIndex = 0;
 
-    std::vector<Cell*> visitedSnapshot;
     std::shared_ptr<const std::vector<Cell*>> pathPtr;
 
     enum class Phase { Visiting, Path };
@@ -34,20 +40,24 @@ int main() {
                 window.close();
         }
 
+        // Always draw the background first
+        window.clear();
+        window.draw(mazeBackground);
+
         if (phase == Phase::Visiting) {
-            // grab visited snapshot from solver
             auto currentVisited = solver.getVisited();
 
             if (visitedIndex < currentVisited.size()) {
                 if (clock.getElapsedTime().asMilliseconds() >= stepMs) {
-                    currentVisited[visitedIndex]->shape.setFillColor(sf::Color(150, 200, 255)); // light blue
-                    currentVisited[visitedIndex]->shape.setOutlineColor(sf::Color(150, 200, 255));
+                    Cell* c = currentVisited[visitedIndex];
+                    c->shape.setFillColor(sf::Color(150, 200, 255));
+                    c->shape.setOutlineColor(sf::Color(150, 200, 255));
+
                     ++visitedIndex;
                     clock.restart();
                 }
             }
             else if (solver.isFinished() && solver.foundPath()) {
-                // all visited done, move to path phase
                 pathPtr = solver.getPath();
                 pathIndex = 0;
                 phase = Phase::Path;
@@ -57,16 +67,25 @@ int main() {
         else if (phase == Phase::Path && pathPtr) {
             if (pathIndex < pathPtr->size()) {
                 if (clock.getElapsedTime().asMilliseconds() >= stepMs) {
-                    (*pathPtr)[pathIndex]->shape.setFillColor(sf::Color::Red);
-                    (*pathPtr)[pathIndex]->shape.setOutlineColor(sf::Color::Red);
+                    Cell* c = (*pathPtr)[pathIndex];
+                    c->shape.setFillColor(sf::Color::Red);
+                    c->shape.setOutlineColor(sf::Color::Red);
+
                     ++pathIndex;
                     clock.restart();
                 }
             }
         }
 
-        window.clear(sf::Color::White);
-        maze.draw(window);
+        // Draw dynamic cells
+        for (std::size_t i = 0; i < visitedIndex; i++)
+            window.draw(solver.getVisited()[i]->shape);
+
+        if (pathPtr) {
+            for (std::size_t i = 0; i < pathIndex; i++)
+                window.draw((*pathPtr)[i]->shape);
+        }
+
         window.display();
     }
 

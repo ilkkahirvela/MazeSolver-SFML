@@ -33,6 +33,6 @@ void Cell::setVisited(bool v) {
     }
 }
 
-void Cell::draw(sf::RenderWindow& window) {
-    window.draw(shape);
+void Cell::draw(sf::RenderTarget& target) {
+    target.draw(shape);
 }

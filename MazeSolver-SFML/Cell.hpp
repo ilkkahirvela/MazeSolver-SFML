@@ -18,5 +18,6 @@ public:
     void setBlocked(bool blocked);
     void setVisited(bool visited);
 
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTarget& target);
+
 };
