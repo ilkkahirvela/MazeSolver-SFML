@@ -1,0 +1,27 @@
+\doxysection{Cell.\+hpp}
+\hypertarget{_cell_8hpp_source}{}\label{_cell_8hpp_source}\index{MazeSolver-\/SFML/Cell.hpp@{MazeSolver-\/SFML/Cell.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#include\ <SFML/Graphics.hpp>}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_cell_ab8e3c58af30b3bb2d025b7ddbabfddcf}{Cell}}\ \{}
+\DoxyCodeLine{00012\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_cell_ac008158796a0bfdf37be2f26eff651ef}{x}},\ y;}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_cell_a52a5cee3909c2f1f2f905cdde8ea8855}{isBlocked}};}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_cell_ac0fdf52adc7d9dd8c5de95635ff04de3}{visited}};}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00023\ \ \ \ \ sf::RectangleShape\ \mbox{\hyperlink{class_cell_ab7140549693a6e055079fbc4259da185}{shape}};}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{class_cell_ab8e3c58af30b3bb2d025b7ddbabfddcf}{Cell}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_cell_ac008158796a0bfdf37be2f26eff651ef}{x}},\ \textcolor{keywordtype}{int}\ y,\ \textcolor{keywordtype}{int}\ size,\ \textcolor{keywordtype}{bool}\ blocked\ =\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_cell_a34f05be3d346b04f5a1c0037a52319cd}{setBlocked}}(\textcolor{keywordtype}{bool}\ blocked);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_cell_a93e3a15c6975796adab41c4d576c44be}{setVisited}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_cell_ac0fdf52adc7d9dd8c5de95635ff04de3}{visited}});}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_cell_aebb6235ff56364cf5568af5e47f440c6}{draw}}(sf::RenderTarget\&\ target);}
+\DoxyCodeLine{00051\ \};}
+
+\end{DoxyCode}

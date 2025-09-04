@@ -1,0 +1,131 @@
+\doxysection{Cell Class Reference}
+\hypertarget{class_cell}{}\label{class_cell}\index{Cell@{Cell}}
+
+
+Represents a single grid cell in the maze.  
+
+
+
+
+{\ttfamily \#include $<$Cell.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_cell_ab8e3c58af30b3bb2d025b7ddbabfddcf}{Cell}} (int \mbox{\hyperlink{class_cell_ac008158796a0bfdf37be2f26eff651ef}{x}}, int y, int size, bool blocked=false)
+\begin{DoxyCompactList}\small\item\em Construct a cell at the given grid position. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cell_a34f05be3d346b04f5a1c0037a52319cd}{set\+Blocked}} (bool blocked)
+\begin{DoxyCompactList}\small\item\em Set whether the cell is blocked. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cell_a93e3a15c6975796adab41c4d576c44be}{set\+Visited}} (bool \mbox{\hyperlink{class_cell_ac0fdf52adc7d9dd8c5de95635ff04de3}{visited}})
+\begin{DoxyCompactList}\small\item\em Mark the cell as visited or not. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_cell_aebb6235ff56364cf5568af5e47f440c6}{draw}} (sf\+::\+Render\+Target \&target)
+\begin{DoxyCompactList}\small\item\em Draw the cell on the given render target. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_cell_ac008158796a0bfdf37be2f26eff651ef}\label{class_cell_ac008158796a0bfdf37be2f26eff651ef} 
+int {\bfseries x}
+\begin{DoxyCompactList}\small\item\em Grid coordinates. \end{DoxyCompactList}\item 
+\Hypertarget{class_cell_ab99a0cead05c6b8129ddf3231b11c1ad}\label{class_cell_ab99a0cead05c6b8129ddf3231b11c1ad} 
+int {\bfseries y}
+\item 
+\Hypertarget{class_cell_a52a5cee3909c2f1f2f905cdde8ea8855}\label{class_cell_a52a5cee3909c2f1f2f905cdde8ea8855} 
+bool {\bfseries is\+Blocked}
+\begin{DoxyCompactList}\small\item\em Whether this cell is blocked (wall) or open (path) \end{DoxyCompactList}\item 
+\Hypertarget{class_cell_ac0fdf52adc7d9dd8c5de95635ff04de3}\label{class_cell_ac0fdf52adc7d9dd8c5de95635ff04de3} 
+bool {\bfseries visited}
+\begin{DoxyCompactList}\small\item\em Whether this cell has been visited during solving (for debugging/visualization) \end{DoxyCompactList}\item 
+\Hypertarget{class_cell_ab7140549693a6e055079fbc4259da185}\label{class_cell_ab7140549693a6e055079fbc4259da185} 
+sf\+::\+Rectangle\+Shape {\bfseries shape}
+\begin{DoxyCompactList}\small\item\em SFML shape used to draw this cell. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Represents a single grid cell in the maze. 
+
+Each cell stores its grid position, state (blocked or open, visited or not), and a rectangle shape for rendering with SFML. 
+
+\label{doc-constructors}
+\Hypertarget{class_cell_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_cell_ab8e3c58af30b3bb2d025b7ddbabfddcf}\index{Cell@{Cell}!Cell@{Cell}}
+\index{Cell@{Cell}!Cell@{Cell}}
+\doxysubsubsection{\texorpdfstring{Cell()}{Cell()}}
+{\footnotesize\ttfamily \label{class_cell_ab8e3c58af30b3bb2d025b7ddbabfddcf} 
+Cell\+::\+Cell (\begin{DoxyParamCaption}\item[{int}]{x}{, }\item[{int}]{y}{, }\item[{int}]{size}{, }\item[{bool}]{blocked}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+Construct a cell at the given grid position. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & Column index in the maze grid. \\
+\hline
+{\em y} & Row index in the maze grid. \\
+\hline
+{\em size} & Pixel size of the cell. \\
+\hline
+{\em blocked} & Whether the cell should be initially blocked. \\
+\hline
+\end{DoxyParams}
+
+
+\label{doc-func-members}
+\Hypertarget{class_cell_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_cell_aebb6235ff56364cf5568af5e47f440c6}\index{Cell@{Cell}!draw@{draw}}
+\index{draw@{draw}!Cell@{Cell}}
+\doxysubsubsection{\texorpdfstring{draw()}{draw()}}
+{\footnotesize\ttfamily \label{class_cell_aebb6235ff56364cf5568af5e47f440c6} 
+void Cell\+::draw (\begin{DoxyParamCaption}\item[{sf\+::\+Render\+Target \&}]{target}{}\end{DoxyParamCaption})}
+
+
+
+Draw the cell on the given render target. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em target} & Reference to an SFML render target (e.\+g., window or texture). \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_cell_a34f05be3d346b04f5a1c0037a52319cd}\index{Cell@{Cell}!setBlocked@{setBlocked}}
+\index{setBlocked@{setBlocked}!Cell@{Cell}}
+\doxysubsubsection{\texorpdfstring{setBlocked()}{setBlocked()}}
+{\footnotesize\ttfamily \label{class_cell_a34f05be3d346b04f5a1c0037a52319cd} 
+void Cell\+::set\+Blocked (\begin{DoxyParamCaption}\item[{bool}]{blocked}{}\end{DoxyParamCaption})}
+
+
+
+Set whether the cell is blocked. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em blocked} & True if cell is a wall, false if it is open. \\
+\hline
+\end{DoxyParams}
+\texorpdfstring{$<$}{<} Walls are black
+
+\texorpdfstring{$<$}{<} Open cells are white\Hypertarget{class_cell_a93e3a15c6975796adab41c4d576c44be}\index{Cell@{Cell}!setVisited@{setVisited}}
+\index{setVisited@{setVisited}!Cell@{Cell}}
+\doxysubsubsection{\texorpdfstring{setVisited()}{setVisited()}}
+{\footnotesize\ttfamily \label{class_cell_a93e3a15c6975796adab41c4d576c44be} 
+void Cell\+::set\+Visited (\begin{DoxyParamCaption}\item[{bool}]{visited}{}\end{DoxyParamCaption})}
+
+
+
+Mark the cell as visited or not. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em visited} & True if visited, false otherwise. \\
+\hline
+\end{DoxyParams}
+\texorpdfstring{$<$}{<} Highlight visited cells (debug/visualization)
+
+\texorpdfstring{$<$}{<} Reset to normal appearance
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Maze\+Solver-\/\+SFML/Cell.\+hpp\item 
+Maze\+Solver-\/\+SFML/Cell.\+cpp\end{DoxyCompactItemize}

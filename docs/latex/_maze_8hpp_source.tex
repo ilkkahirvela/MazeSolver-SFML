@@ -1,0 +1,33 @@
+\doxysection{Maze.\+hpp}
+\hypertarget{_maze_8hpp_source}{}\label{_maze_8hpp_source}\index{MazeSolver-\/SFML/Maze.hpp@{MazeSolver-\/SFML/Maze.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#include\ <SFML/Graphics.hpp>}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}Cell.hpp"{}}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_maze_acf513f22732b388b5e2df3941b729f28}{Maze}}\ \{}
+\DoxyCodeLine{00014\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{class_maze_acf513f22732b388b5e2df3941b729f28}{Maze}}(\textcolor{keywordtype}{int}\ cols,\ \textcolor{keywordtype}{int}\ rows,\ \textcolor{keywordtype}{int}\ cellSize);}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_maze_a8c1641f0761457416e343e3ea70c567b}{generate}}();}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_maze_aca702a435fc5b61d9b33bde0c09ba312}{draw}}(sf::RenderTarget\&\ target);}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{class_cell}{Cell}}\&\ \mbox{\hyperlink{class_maze_a11ada24726e265be5c77f6bb8e2ce663}{getCell}}(\textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{int}\ y);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00049\ \ \ \ \ std::vector<std::vector<Cell>>\&\ \mbox{\hyperlink{class_maze_a9953f794b0a8bab06090c90c6a3c2f51}{getGrid}}()\ \{\ \textcolor{keywordflow}{return}\ \_grid;\ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_maze_a4e23c13ac868bda31bcca68ff7ae907c}{getRows}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_rows;\ \}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_maze_a6d76b266d13231ee76502c232ffb9206}{getCols}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_cols;\ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{int}\ \_cols;\ \ \ \ \ \ }
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{int}\ \_rows;\ \ \ \ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordtype}{int}\ \_cellSize;\ \ }
+\DoxyCodeLine{00065\ \ \ \ \ std::vector<std::vector<Cell>>\ \_grid;\ }
+\DoxyCodeLine{00066\ \};}
+
+\end{DoxyCode}
