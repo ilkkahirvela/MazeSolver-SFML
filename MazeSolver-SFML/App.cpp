@@ -1,5 +1,30 @@
 /**
- * @file main.cpp
+ * @mainpage Maze Solver Visualization
+ *
+ * @section intro_sec Introduction
+ * This project demonstrates maze generation and solving with an animated
+ * visualization built using C++ and the SFML graphics library.
+ *
+ * @section algo_sec Algorithms
+ * - Maze generation: Recursive Backtracking (Depth-First Search)
+ * - Maze solving: Breadth-First Search (BFS)
+ *
+ * @section viz_sec Visualization
+ * - Maze walls are drawn once into a static layer.
+ * - Visited cells are shown in light blue as the solver explores.
+ * - The final shortest path is shown in red once discovered.
+ *
+ * @section deps_sec Dependencies
+ * - C++17 or newer
+ * - SFML 3.0+ (graphics, window, system)
+ *
+ * @section usage_sec Usage
+ * Build and run the program. An SFML window opens to show the maze generation
+ * and solving process step by step.
+ */
+
+/**
+ * @file app.cpp
  * @brief Maze generation and solver visualization using SFML.
  *
  * This program generates a maze, solves it using BFS in a separate thread,
