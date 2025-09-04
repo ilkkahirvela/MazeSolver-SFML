@@ -6,8 +6,6 @@
 #include <vector>
 #include <utility>
 
-
-// Maze initial contructor
 Maze::Maze(int cols, int rows, int cellSize)
     : _cols(cols), _rows(rows), _cellSize(cellSize)
 {
@@ -17,38 +15,39 @@ Maze::Maze(int cols, int rows, int cellSize)
         _grid[y].reserve(_cols);
         for (int x = 0; x < _cols; x++) {
             _grid[y].emplace_back(x, y, _cellSize);
-            _grid[y][x].setBlocked(true); // default all to blocked
+            _grid[y][x].setBlocked(true); // default: all walls
             _grid[y][x].shape.setOutlineColor(sf::Color::Black);
         }
     }
 }
 
 void Maze::generate() {
-    // --- DFS MAZE (recursive backtracker) on a tile grid ---
-    // Uses odd (x,y) as "rooms" and carves walls between them.
+    // --- Recursive Backtracker (Depth-First Search) algorithm ---
+    // Operates on odd coordinates as "rooms" and carves walls between them.
 
     if (_rows >= 3 && _cols >= 3) {
         std::mt19937 rng(std::random_device{}());
 
+        // Check if a cell is inside the maze bounds (excluding borders)
         auto inBoundsInner = [&](int x, int y) {
             return x > 0 && x < _cols - 1 && y > 0 && y < _rows - 1;
             };
 
-        // Track carved (open) tiles to avoid relying on Cell internals.
+        // Mark a cell as carved (open)
         std::vector<std::vector<uint8_t>> open(_rows, std::vector<uint8_t>(_cols, 0));
-
         auto carve = [&](int cx, int cy) {
             _grid[cy][cx].setBlocked(false);
             open[cy][cx] = 1;
             };
 
-        // Pick a random odd start (or (1,1) if minimal)
+        // Choose a random odd coordinate (ensures corridors between walls)
         auto randOdd = [&](int limit) -> int {
-            if (limit <= 2) return 1 % limit; // handle tiny grids
+            if (limit <= 2) return 1 % limit; // handle tiny grids safely
             std::uniform_int_distribution<int> d(0, (limit - 3) / 2);
             return 1 + 2 * d(rng);
             };
 
+        // Random starting cell
         int sx = (_cols > 2) ? randOdd(_cols) : 0;
         int sy = (_rows > 2) ? randOdd(_rows) : 0;
 
@@ -58,10 +57,11 @@ void Maze::generate() {
 
         const std::pair<int, int> DIRS[4] = { {2,0},{-2,0},{0,2},{0,-2} };
 
+        // DFS loop
         while (!stack.empty()) {
             auto [cx, cy] = stack.back();
 
-            // collect uncarved odd neighbors
+            // Collect uncarved neighbors
             std::vector<std::pair<int, int>> nbrs;
             nbrs.reserve(4);
             for (auto [dx, dy] : DIRS) {
@@ -72,10 +72,11 @@ void Maze::generate() {
             }
 
             if (!nbrs.empty()) {
+                // Pick random neighbor and carve path
                 std::shuffle(nbrs.begin(), nbrs.end(), rng);
                 auto [nx, ny] = nbrs.front();
 
-                // carve the wall between (cx,cy) and (nx,ny)
+                // Carve wall between current cell and neighbor
                 int wx = cx + (nx - cx) / 2;
                 int wy = cy + (ny - cy) / 2;
                 carve(wx, wy);
@@ -88,8 +89,7 @@ void Maze::generate() {
             }
         }
 
-        // Add an entrance at top and exit at bottom
-        // Find an open tile on row 1 and row _rows-2 and punch through the border.
+        // Create entrance (top) and exit (bottom)
         for (int x = 1; x < _cols - 1; ++x) {
             if (open[1][x]) { _grid[0][x].setBlocked(false); break; }
         }
@@ -99,7 +99,6 @@ void Maze::generate() {
     }
 }
 
-// Displaying the maze
 void Maze::draw(sf::RenderTarget& target) {
     for (int y = 0; y < _rows; y++) {
         for (int x = 0; x < _cols; x++) {

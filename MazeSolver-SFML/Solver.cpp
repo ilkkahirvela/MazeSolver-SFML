@@ -3,7 +3,8 @@
 #include <map>
 #include <algorithm>
 
-static const std::pair<int, int> DIRS4[4] = { {1,0},{-1,0},{0,1},{0,-1} };
+/// Directions for BFS (right, left, down, up).
+static const std::pair<int, int> DIRS4[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 
 Solver::Solver(Maze& maze)
     : _maze(maze),
@@ -25,7 +26,7 @@ void Solver::run() {
     const int rows = _maze.getRows();
     const int cols = _maze.getCols();
 
-    // find start/goal on top/bottom rows
+    // --- Find start and goal cells (top row open, bottom row open) ---
     int startX = -1, goalX = -1;
     for (int x = 0; x < cols; ++x) if (!grid[0][x].isBlocked) { startX = x; break; }
     for (int x = 0; x < cols; ++x) if (!grid[rows - 1][x].isBlocked) { goalX = x; break; }
@@ -34,28 +35,31 @@ void Solver::run() {
     const std::pair<int, int> start{ startX, 0 };
     const std::pair<int, int> goal{ goalX, rows - 1 };
 
-    std::queue<std::pair<int, int>> q;
-    std::map<std::pair<int, int>, std::pair<int, int>> parent;
+    std::queue<std::pair<int, int>> q; ///< BFS queue.
+    std::map<std::pair<int, int>, std::pair<int, int>> parent; ///< Parent mapping for path reconstruction.
 
     q.push(start);
     parent[start] = { -1,-1 };
 
     bool found = false;
 
+    // --- BFS loop ---
     while (!q.empty()) {
         auto [cx, cy] = q.front(); q.pop();
 
-        // record visited (thread-safe)
+        // Record visited cell in a thread-safe way
         {
             std::lock_guard<std::mutex> lock(_mtx);
             _visited->push_back(&grid[cy][cx]);
         }
 
+        // Goal reached
         if (cx == goal.first && cy == goal.second) {
             found = true;
             break;
         }
 
+        // Explore neighbors
         for (auto [dx, dy] : DIRS4) {
             int nx = cx + dx, ny = cy + dy;
             if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) continue;
@@ -67,7 +71,7 @@ void Solver::run() {
         }
     }
 
-    // build path if found
+    // --- Build path if found ---
     if (found) {
         std::vector<Cell*> pathVec;
         auto cur = goal;
@@ -87,12 +91,12 @@ void Solver::run() {
 
 std::shared_ptr<const std::vector<Cell*>> Solver::getPath() const {
     std::lock_guard<std::mutex> lock(_mtx);
-    // allow returning nullptr if no path found / not ready
+    // Return nullptr if no path is available yet
     return std::static_pointer_cast<const std::vector<Cell*>>(_path);
 }
 
 std::vector<Cell*> Solver::getVisited() const {
     std::lock_guard<std::mutex> lock(_mtx);
     if (!_visited) return {};
-    return *_visited; // copy snapshot
+    return *_visited; // Copy snapshot for thread safety
 }

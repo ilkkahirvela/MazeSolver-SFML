@@ -1,23 +1,51 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+/**
+ * @class Cell
+ * @brief Represents a single grid cell in the maze.
+ *
+ * Each cell stores its grid position, state (blocked or open, visited or not),
+ * and a rectangle shape for rendering with SFML.
+ */
 class Cell {
 public:
-    // Grid position
+    /// Grid coordinates
     int x, y;
 
-    // State
+    /// Whether this cell is blocked (wall) or open (path)
     bool isBlocked;
+
+    /// Whether this cell has been visited during solving (for debugging/visualization)
     bool visited;
 
-    // Visuals
+    /// SFML shape used to draw this cell
     sf::RectangleShape shape;
 
+    /**
+     * @brief Construct a cell at the given grid position.
+     * @param x Column index in the maze grid.
+     * @param y Row index in the maze grid.
+     * @param size Pixel size of the cell.
+     * @param blocked Whether the cell should be initially blocked.
+     */
     Cell(int x, int y, int size, bool blocked = false);
 
+    /**
+     * @brief Set whether the cell is blocked.
+     * @param blocked True if cell is a wall, false if it is open.
+     */
     void setBlocked(bool blocked);
+
+    /**
+     * @brief Mark the cell as visited or not.
+     * @param visited True if visited, false otherwise.
+     */
     void setVisited(bool visited);
 
+    /**
+     * @brief Draw the cell on the given render target.
+     * @param target Reference to an SFML render target (e.g., window or texture).
+     */
     void draw(sf::RenderTarget& target);
-
 };
