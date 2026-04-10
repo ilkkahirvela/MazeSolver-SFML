@@ -21,6 +21,15 @@ Maze::Maze(int cols, int rows, int cellSize)
     }
 }
 
+void Maze::reset() {
+    for (int y = 0; y < _rows; y++) {
+        for (int x = 0; x < _cols; x++) {
+            _grid[y][x].setBlocked(true);
+            _grid[y][x].shape.setOutlineColor(sf::Color::Black);
+        }
+    }
+}
+
 void Maze::generate() {
     // --- Recursive Backtracker (Depth-First Search) algorithm ---
     // Operates on odd coordinates as "rooms" and carves walls between them.

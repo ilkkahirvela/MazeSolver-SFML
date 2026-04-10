@@ -16,9 +16,6 @@ public:
     /// Whether this cell is blocked (wall) or open (path)
     bool isBlocked;
 
-    /// Whether this cell has been visited during solving (for debugging/visualization)
-    bool visited;
-
     /// SFML shape used to draw this cell
     sf::RectangleShape shape;
 
@@ -36,12 +33,6 @@ public:
      * @param blocked True if cell is a wall, false if it is open.
      */
     void setBlocked(bool blocked);
-
-    /**
-     * @brief Mark the cell as visited or not.
-     * @param visited True if visited, false otherwise.
-     */
-    void setVisited(bool visited);
 
     /**
      * @brief Draw the cell on the given render target.

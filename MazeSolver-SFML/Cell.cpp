@@ -2,7 +2,7 @@
 #include <vector>
 
 Cell::Cell(int x, int y, int size, bool blocked)
-    : x(x), y(y), isBlocked(blocked), visited(false)
+    : x(x), y(y), isBlocked(blocked)
 {
     // Rectangle size with small spacing (grid lines)
     shape.setSize(sf::Vector2f((float)size - 2, (float)size - 2));
@@ -21,16 +21,6 @@ void Cell::setBlocked(bool blocked) {
         shape.setFillColor(sf::Color::White); ///< Open cells are white
         shape.setOutlineColor(sf::Color::White);
         // shape.setOutlineColor(sf::Color(200, 200, 200)); // alternative grid outline
-    }
-}
-
-void Cell::setVisited(bool v) {
-    visited = v;
-    if (visited) {
-        shape.setFillColor(sf::Color::Yellow); ///< Highlight visited cells (debug/visualization)
-    }
-    else {
-        setBlocked(isBlocked); ///< Reset to normal appearance
     }
 }
 

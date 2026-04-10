@@ -20,7 +20,7 @@
  *
  * @section usage_sec Usage
  * Build and run the program. An SFML window opens to show the maze generation
- * and solving process step by step.
+ * and solving process step by step. Press R to generate and solve a new maze.
  */
 
 /**
@@ -34,17 +34,20 @@
  * - Static rendering of maze walls (drawn once into a render texture).
  * - Dynamic rendering of visited cells (light blue) and final path (red).
  * - Step-by-step animated visualization.
+ * - Press R to restart with a new randomly generated maze.
  */
 
 #include "Maze.hpp"
 #include "Solver.hpp"
 #include <SFML/Graphics.hpp>
+#include <memory>
 
  /**
   * @brief Main entry point of the application.
   *
   * Initializes a window, generates a maze, starts the solver in a separate
   * thread, and animates the solving process using SFML graphics.
+  * Press R at any time to restart with a new maze.
   *
   * @return int Exit status code.
   */
@@ -58,44 +61,67 @@ int main() {
         "Maze Solver"
     );
 
-    /// Initialize and generate the maze
+    /// Initialize maze
     Maze maze(cols, rows, cellSize);
-    maze.generate();
-
-    /// Create solver and start it in a background thread
-    Solver solver(maze);
-    solver.start();
 
     // ---------------------------------------------------------------------
     // STATIC LAYER: maze walls (drawn once into a render texture)
     // ---------------------------------------------------------------------
     sf::RenderTexture staticLayer({ cols * cellSize, rows * cellSize });
-    staticLayer.clear(sf::Color::White);
-    maze.draw(staticLayer);        ///< Draw entire maze once
-    staticLayer.display();
     sf::Sprite mazeBackground(staticLayer.getTexture());
 
     // ---------------------------------------------------------------------
     // DYNAMIC LAYER: visited + path cells (incrementally updated)
     // ---------------------------------------------------------------------
     sf::RenderTexture dynamicLayer({ cols * cellSize, rows * cellSize });
-    dynamicLayer.clear(sf::Color::Transparent);
-    dynamicLayer.display();
     sf::Sprite dynamicOverlay(dynamicLayer.getTexture());
 
     // ---------------------------------------------------------------------
     // Animation control variables
     // ---------------------------------------------------------------------
-    sf::Clock clock;                  ///< Timer for controlling animation speed
-    const float stepMs = 0.5f;         ///< Delay between animation steps (ms)
-    std::size_t visitedIndex = 0;     ///< Index of current visited cell
-    std::size_t pathIndex = 0;        ///< Index of current path cell
-
-    std::shared_ptr<const std::vector<Cell*>> pathPtr; ///< Shared pointer to solution path
+    sf::Clock clock;
+    const float stepMs = 0.5f;             ///< Delay between animation steps (ms)
+    std::size_t visitedIndex = 0;
+    std::size_t pathIndex = 0;
+    std::shared_ptr<const std::vector<Cell*>> pathPtr;
 
     /// Solver phase (Visiting cells or showing final Path)
     enum class Phase { Visiting, Path };
     Phase phase = Phase::Visiting;
+
+    std::unique_ptr<Solver> solver;
+
+    // ---------------------------------------------------------------------
+    // Reset: regenerate maze, clear layers, restart solver
+    // ---------------------------------------------------------------------
+    auto resetAll = [&]() {
+        if (solver) {
+            solver->join();
+            solver.reset();
+        }
+
+        maze.reset();
+        maze.generate();
+
+        staticLayer.clear(sf::Color::White);
+        maze.draw(staticLayer);
+        staticLayer.display();
+
+        dynamicLayer.clear(sf::Color::Transparent);
+        dynamicLayer.display();
+
+        visitedIndex = 0;
+        pathIndex = 0;
+        pathPtr = nullptr;
+        phase = Phase::Visiting;
+        clock.restart();
+
+        solver = std::make_unique<Solver>(maze);
+        solver->start();
+    };
+
+    /// Initial run
+    resetAll();
 
     // ---------------------------------------------------------------------
     // Main render loop
@@ -105,13 +131,18 @@ int main() {
         while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>())
                 window.close();
+
+            if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
+                if (key->code == sf::Keyboard::Key::R)
+                    resetAll();
+            }
         }
 
         // -------------------------------
         // Phase 1: Animate visited cells
         // -------------------------------
         if (phase == Phase::Visiting) {
-            auto currentVisited = solver.getVisited();
+            auto currentVisited = solver->getVisited();
 
             if (visitedIndex < currentVisited.size()) {
                 if (clock.getElapsedTime().asMilliseconds() >= stepMs) {
@@ -119,7 +150,6 @@ int main() {
                     c->shape.setFillColor(sf::Color(150, 200, 255));
                     c->shape.setOutlineColor(sf::Color(150, 200, 255));
 
-                    // Draw updated cell into dynamic layer (persistent)
                     dynamicLayer.draw(c->shape);
                     dynamicLayer.display();
 
@@ -127,9 +157,8 @@ int main() {
                     clock.restart();
                 }
             }
-            else if (solver.isFinished() && solver.foundPath()) {
-                // Switch to path animation phase
-                pathPtr = solver.getPath();
+            else if (solver->isFinished() && solver->foundPath()) {
+                pathPtr = solver->getPath();
                 pathIndex = 0;
                 phase = Phase::Path;
                 clock.restart();
@@ -145,7 +174,6 @@ int main() {
                     c->shape.setFillColor(sf::Color::Red);
                     c->shape.setOutlineColor(sf::Color::Red);
 
-                    // Draw updated cell into dynamic layer (persistent)
                     dynamicLayer.draw(c->shape);
                     dynamicLayer.display();
 
@@ -159,12 +187,12 @@ int main() {
         // Compose final frame
         // -------------------------------
         window.clear();
-        window.draw(mazeBackground);   ///< Static maze walls
-        window.draw(dynamicOverlay);   ///< Incrementally drawn visited + path cells
+        window.draw(mazeBackground);    ///< Static maze walls
+        window.draw(dynamicOverlay);    ///< Incrementally drawn visited + path cells
         window.display();
     }
 
     /// Ensure solver thread is joined before exiting
-    solver.join();
+    solver->join();
     return 0;
 }

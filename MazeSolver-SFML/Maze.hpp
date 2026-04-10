@@ -21,6 +21,13 @@ public:
     Maze(int cols, int rows, int cellSize);
 
     /**
+     * @brief Reset all cells back to blocked (wall) state.
+     *
+     * Call before generate() to produce a fresh maze in the same grid.
+     */
+    void reset();
+
+    /**
      * @brief Generate a randomized maze using recursive backtracking.
      *
      * Carves passages between cells starting from a random odd coordinate.

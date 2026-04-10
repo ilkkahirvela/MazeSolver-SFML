@@ -1,10 +1,16 @@
 ﻿#include "Solver.hpp"
 #include <queue>
-#include <map>
+#include <unordered_map>
 #include <algorithm>
 
 /// Directions for BFS (right, left, down, up).
 static const std::pair<int, int> DIRS4[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+
+struct PairHash {
+    std::size_t operator()(const std::pair<int, int>& p) const {
+        return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 16);
+    }
+};
 
 Solver::Solver(Maze& maze)
     : _maze(maze),
@@ -36,7 +42,7 @@ void Solver::run() {
     const std::pair<int, int> goal{ goalX, rows - 1 };
 
     std::queue<std::pair<int, int>> q; ///< BFS queue.
-    std::map<std::pair<int, int>, std::pair<int, int>> parent; ///< Parent mapping for path reconstruction.
+    std::unordered_map<std::pair<int, int>, std::pair<int, int>, PairHash> parent; ///< Parent mapping for path reconstruction.
 
     q.push(start);
     parent[start] = { -1,-1 };
