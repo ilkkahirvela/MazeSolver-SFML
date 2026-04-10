@@ -87,7 +87,7 @@ int main() {
     // Animation control variables
     // ---------------------------------------------------------------------
     sf::Clock clock;                  ///< Timer for controlling animation speed
-    const int stepMs = 0.5;           ///< Delay between animation steps (ms)
+    const float stepMs = 0.5f;         ///< Delay between animation steps (ms)
     std::size_t visitedIndex = 0;     ///< Index of current visited cell
     std::size_t pathIndex = 0;        ///< Index of current path cell
 
