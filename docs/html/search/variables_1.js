@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['shape_0',['shape',['../class_cell.html#ab7140549693a6e055079fbc4259da185',1,'Cell']]]
+  ['isblocked_0',['isBlocked',['../class_cell.html#a52a5cee3909c2f1f2f905cdde8ea8855',1,'Cell']]]
 ];

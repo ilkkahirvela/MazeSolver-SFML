@@ -49,9 +49,9 @@
  * drives a velocity ramp for smooth continuous movement.
  */
 struct NavKey {
-    bool      wasDown     = false;
-    bool      justPressed = false; ///< True for one frame on initial press
-    sf::Clock held;
+    bool      wasDown     = false;          ///< True while the key is held down
+    bool      justPressed = false;          ///< True for one frame on initial press
+    sf::Clock held;                         ///< Measures how long the key has been held
 
     /// Poll the key state and update internal flags. Call once per frame.
     void update(sf::Keyboard::Key key) {

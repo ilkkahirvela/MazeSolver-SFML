@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['join_0',['join',['../class_solver.html#aadf4e2c4ab497297720ff8796d37d8c6',1,'Solver']]]
+  ['isfinished_0',['isFinished',['../class_solver.html#a8f024ca4553f8102f72791849a52ba12',1,'Solver']]]
 ];

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['main_0',['main',['../_app_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'App.cpp']]],
-  ['maze_1',['Maze',['../class_maze.html',1,'Maze'],['../class_maze.html#acf513f22732b388b5e2df3941b729f28',1,'Maze::Maze()']]],
-  ['maze_20solver_20visualization_2',['Maze Solver Visualization',['../index.html',1,'']]]
+  ['join_0',['join',['../class_solver.html#aadf4e2c4ab497297720ff8796d37d8c6',1,'Solver']]],
+  ['justpressed_1',['justPressed',['../struct_nav_key.html#a8ee7c593a1fa275cc2a7d9f61b185e90',1,'NavKey']]]
 ];

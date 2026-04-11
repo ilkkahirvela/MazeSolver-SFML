@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.14.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Maze Solver Visualization: MazeSolver-SFML/App.cpp File Reference</title>
+<title>Maze Solver Visualization: NavKey Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('_app_8cpp.html','',''); });
+$(function(){initNavTree('struct_nav_key.html','','struct_nav_key-members'); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -89,57 +89,40 @@ $(function(){initNavTree('_app_8cpp.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">App.cpp File Reference</div></div>
+  <div class="headertitle"><div class="title">NavKey Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> generation and solver visualization using SFML and Dear ImGui.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;Maze.hpp&quot;</code><br />
-<code>#include &quot;Solver.hpp&quot;</code><br />
-<code>#include &lt;SFML/Graphics.hpp&gt;</code><br />
-<code>#include &lt;imgui.h&gt;</code><br />
-<code>#include &lt;imgui-SFML.h&gt;</code><br />
-<code>#include &lt;memory&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:NavKey" id="r_NavKey"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nav_key.html">NavKey</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tracks a single key's press and hold state for velocity-based UI navigation.  <a href="struct_nav_key.html#details">More...</a><br /></td></tr>
+<p>Tracks a single key's press and hold state for velocity-based UI navigation.  
+ <a href="#details">More...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a0b49ab08d33a372a6bd2f3d990cdffbd" id="r_a0b49ab08d33a372a6bd2f3d990cdffbd"><td class="memItemLeft" align="right" valign="top"><a id="a0b49ab08d33a372a6bd2f3d990cdffbd" name="a0b49ab08d33a372a6bd2f3d990cdffbd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (sf::Keyboard::Key key)</td></tr>
+<tr class="memdesc:a0b49ab08d33a372a6bd2f3d990cdffbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Poll the key state and update internal flags. Call once per frame. <br /></td></tr>
+<tr class="memitem:a9cc146e07a266d86f6421ee0577b7669" id="r_a9cc146e07a266d86f6421ee0577b7669"><td class="memItemLeft" align="right" valign="top"><a id="a9cc146e07a266d86f6421ee0577b7669" name="a9cc146e07a266d86f6421ee0577b7669"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>heldSecs</b> () const</td></tr>
+<tr class="memdesc:a9cc146e07a266d86f6421ee0577b7669"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seconds the key has been held continuously (0 if not held). <br /></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:ae66f6b31b5ad750f1fe042a706a4e3d4" id="r_ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a> ()</td></tr>
-<tr class="memdesc:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point of the application.  <br /></td></tr>
+<tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a73b860ef222d3efa5b8a4167f71f96ad" id="r_a73b860ef222d3efa5b8a4167f71f96ad"><td class="memItemLeft" align="right" valign="top"><a id="a73b860ef222d3efa5b8a4167f71f96ad" name="a73b860ef222d3efa5b8a4167f71f96ad"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>wasDown</b> = false</td></tr>
+<tr class="memdesc:a73b860ef222d3efa5b8a4167f71f96ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">True while the key is held down. <br /></td></tr>
+<tr class="memitem:a8ee7c593a1fa275cc2a7d9f61b185e90" id="r_a8ee7c593a1fa275cc2a7d9f61b185e90"><td class="memItemLeft" align="right" valign="top"><a id="a8ee7c593a1fa275cc2a7d9f61b185e90" name="a8ee7c593a1fa275cc2a7d9f61b185e90"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>justPressed</b> = false</td></tr>
+<tr class="memdesc:a8ee7c593a1fa275cc2a7d9f61b185e90"><td class="mdescLeft">&#160;</td><td class="mdescRight">True for one frame on initial press. <br /></td></tr>
+<tr class="memitem:af77e104338b18884f5041ac147fe0bbf" id="r_af77e104338b18884f5041ac147fe0bbf"><td class="memItemLeft" align="right" valign="top"><a id="af77e104338b18884f5041ac147fe0bbf" name="af77e104338b18884f5041ac147fe0bbf"></a>
+sf::Clock&#160;</td><td class="memItemRight" valign="bottom"><b>held</b></td></tr>
+<tr class="memdesc:af77e104338b18884f5041ac147fe0bbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Measures how long the key has been held. <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> generation and solver visualization using SFML and Dear ImGui. </p>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ae66f6b31b5ad750f1fe042a706a4e3d4" name="ae66f6b31b5ad750f1fe042a706a4e3d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">&#9670;&#160;</a></span>main()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int main </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Main entry point of the application. </p>
-<p>Opens a settings panel (Dear ImGui) where the user configures maze dimensions and animation speed. On generate, the maze is built and BFS runs in a background thread while the solving process is animated in real time.</p>
-<p>Keybindings during solving:</p><ul>
-<li>R: regenerate a new maze with the same settings</li>
-<li>Esc: return to the settings panel</li>
+<div class="textblock"><p>Tracks a single key's press and hold state for velocity-based UI navigation. </p>
+<p>On the first frame the key is pressed, <code>justPressed</code> is true and can be used to fire a single minimum step. On subsequent frames while held, <code><a class="el" href="#a9cc146e07a266d86f6421ee0577b7669" title="Seconds the key has been held continuously (0 if not held).">heldSecs()</a></code> drives a velocity ramp for smooth continuous movement. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>MazeSolver-SFML/<a class="el" href="_app_8cpp.html">App.cpp</a></li>
 </ul>
-<dl class="section return"><dt>Returns</dt><dd>int Exit status code. </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
@@ -153,7 +136,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="dir_6904495bb6e8ad7a575faf9d7dfc8f7e.html">MazeSolver-SFML</a></li><li class="navelem"><a href="_app_8cpp.html">App.cpp</a></li>
+    <li class="navelem"><a href="struct_nav_key.html">NavKey</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0 </li>
   </ul>
 </div>

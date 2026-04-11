@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['x_0',['x',['../class_cell.html#ac008158796a0bfdf37be2f26eff651ef',1,'Cell']]]
+  ['justpressed_0',['justPressed',['../struct_nav_key.html#a8ee7c593a1fa275cc2a7d9f61b185e90',1,'NavKey']]]
 ];

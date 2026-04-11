@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['x_0',['x',['../class_cell.html#ac008158796a0bfdf37be2f26eff651ef',1,'Cell']]]
+  ['update_0',['update',['../struct_nav_key.html#a0b49ab08d33a372a6bd2f3d990cdffbd',1,'NavKey']]],
+  ['usage_1',['Usage',['../index.html#usage_sec',1,'']]]
 ];

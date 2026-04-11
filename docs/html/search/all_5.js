@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['introduction_0',['Introduction',['../index.html#intro_sec',1,'']]],
-  ['isblocked_1',['isBlocked',['../class_cell.html#a52a5cee3909c2f1f2f905cdde8ea8855',1,'Cell']]],
-  ['isfinished_2',['isFinished',['../class_solver.html#a8f024ca4553f8102f72791849a52ba12',1,'Solver']]]
+  ['held_0',['held',['../struct_nav_key.html#af77e104338b18884f5041ac147fe0bbf',1,'NavKey']]],
+  ['heldsecs_1',['heldSecs',['../struct_nav_key.html#a9cc146e07a266d86f6421ee0577b7669',1,'NavKey']]]
 ];

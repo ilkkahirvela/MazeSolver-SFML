@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['y_0',['y',['../class_cell.html#ab99a0cead05c6b8129ddf3231b11c1ad',1,'Cell']]]
+  ['visualization_0',['Visualization',['../index.html',1,'Maze Solver Visualization'],['../index.html#viz_sec',1,'Visualization']]]
 ];

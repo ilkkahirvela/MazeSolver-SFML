@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['isfinished_0',['isFinished',['../class_solver.html#a8f024ca4553f8102f72791849a52ba12',1,'Solver']]]
+  ['heldsecs_0',['heldSecs',['../struct_nav_key.html#a9cc146e07a266d86f6421ee0577b7669',1,'NavKey']]]
 ];

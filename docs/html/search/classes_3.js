@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['solver_0',['Solver',['../class_solver.html',1,'']]]
+  ['pairhash_0',['PairHash',['../struct_pair_hash.html',1,'']]]
 ];
