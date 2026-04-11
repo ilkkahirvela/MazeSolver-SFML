@@ -21,7 +21,6 @@ void Cell::setBlocked(bool blocked) {
     else {
         shape.setFillColor(sf::Color::White); ///< Open cells are white
         shape.setOutlineColor(sf::Color::White);
-        // shape.setOutlineColor(sf::Color(200, 200, 200)); // alternative grid outline
     }
 }
 

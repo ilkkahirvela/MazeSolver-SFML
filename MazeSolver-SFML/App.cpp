@@ -37,6 +37,19 @@
 #include <imgui-SFML.h>
 #include <memory>
 
+/**
+ * @brief Main entry point of the application.
+ *
+ * Opens a settings panel (Dear ImGui) where the user configures maze dimensions
+ * and animation speed. On generate, the maze is built and BFS runs in a background
+ * thread while the solving process is animated in real time.
+ *
+ * Keybindings during solving:
+ * - R: regenerate a new maze with the same settings
+ * - Esc: return to the settings panel
+ *
+ * @return int Exit status code.
+ */
 int main() {
     // ---------------------------------------------------------------------
     // Settings (configurable via ImGui panel)
