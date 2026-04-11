@@ -45,15 +45,28 @@ int main() {
     int rows = 151;
 
     // ---------------------------------------------------------------------
-    // Initial window — sized to settings panel only, resized on generate
+    // Scale all UI dimensions relative to 1080p
+    // ---------------------------------------------------------------------
+    const float scale = std::max(0.5f, std::min(
+        (float)sf::VideoMode::getDesktopMode().size.y / 1080.f, 3.0f
+    ));
+
+    const int   taskbarHeight = (int)(80  * scale);
+    const int   uiW           = (int)(400 * scale);
+    const int   uiH           = (int)(285 * scale);
+    const float uiLabelW      = std::round(120.f * scale);
+    const float uiSliderW     = std::round(200.f * scale);
+    const float uiBtnW        = std::round(120.f * scale);
+    const float uiBtnH        = std::round(32.f  * scale);
+
+    // ---------------------------------------------------------------------
+    // Initial window - sized to settings panel only, resized on generate
     // ---------------------------------------------------------------------
     sf::RenderWindow window(
-        sf::VideoMode({ 400, 245 }),
+        sf::VideoMode({ (unsigned)uiW, (unsigned)uiH }),
         "Maze Solver - Settings"
     );
     window.setFramerateLimit(60);
-
-    const int taskbarHeight = 80;
 
     // Center window on screen, leaving room for the taskbar at the bottom
     auto centerWindow = [&](int w, int h) {
@@ -63,9 +76,90 @@ int main() {
         window.setPosition(sf::Vector2i(std::max(0, x), std::max(0, y)));
     };
 
-    centerWindow(400, 245);
+    centerWindow(uiW, uiH);
 
     (void)ImGui::SFML::Init(window);
+
+    // ---------------------------------------------------------------------
+    // Font - Segoe UI, fall back to ImGui default if unavailable
+    // ---------------------------------------------------------------------
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        (void)io.Fonts->Clear();
+        ImFont* font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/consola.ttf", std::round(17.f * scale));
+        if (font) (void)ImGui::SFML::UpdateFontTexture();
+    }
+
+    // ---------------------------------------------------------------------
+    // Style - dark theme matching maze colors
+    // Palette:
+    //   bg         #141414  (maze wall black)
+    //   frame      #282828  (slightly lighter)
+    //   accent     #96C8FF  (150,200,255 - visited cell blue)
+    //   btn        #3D6FA0  (deeper blue for resting button)
+    //   text       #FFFFFF  (open cell white)
+    // ---------------------------------------------------------------------
+    {
+        ImGui::StyleColorsDark();
+        auto& s = ImGui::GetStyle();
+
+        s.WindowRounding    = 0.0f;
+        s.FrameRounding     = 0.0f;
+        s.GrabRounding      = 0.0f;
+        s.ScrollbarRounding = 0.0f;
+        s.TabRounding       = 0.0f;
+        s.PopupRounding     = 0.0f;
+        s.ChildRounding     = 0.0f;
+        s.WindowBorderSize  = 0.0f;
+        s.FrameBorderSize   = 0.0f;
+        s.WindowPadding     = ImVec2(std::round(18.f * scale), std::round(18.f * scale));
+        s.FramePadding      = ImVec2(std::round(8.f  * scale), std::round(5.f  * scale));
+        s.ItemSpacing       = ImVec2(std::round(10.f * scale), std::round(10.f * scale));
+        s.GrabMinSize       = std::round(10.f * scale);
+
+        ImVec4* c = s.Colors;
+
+        // Background / panels
+        c[ImGuiCol_WindowBg]         = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+        c[ImGuiCol_PopupBg]          = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+
+        // Text
+        c[ImGuiCol_Text]             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+        c[ImGuiCol_TextDisabled]     = ImVec4(0.45f, 0.55f, 0.65f, 1.00f);
+
+        // Frames (slider bg, input bg)
+        c[ImGuiCol_FrameBg]          = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
+        c[ImGuiCol_FrameBgHovered]   = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+        c[ImGuiCol_FrameBgActive]    = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+
+        // Separator / border
+        c[ImGuiCol_Separator]        = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+        c[ImGuiCol_SeparatorHovered] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+        c[ImGuiCol_SeparatorActive]  = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+
+        // Slider grab - visited cell blue
+        c[ImGuiCol_SliderGrab]       = ImVec4(0.45f, 0.65f, 0.90f, 1.00f);
+        c[ImGuiCol_SliderGrabActive] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+
+        // Scrollbar
+        c[ImGuiCol_ScrollbarBg]      = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+        c[ImGuiCol_ScrollbarGrab]    = ImVec4(0.45f, 0.65f, 0.90f, 1.00f);
+        c[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+        c[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+
+        // Buttons - resting is a muted blue, hover/active rise to visited-cell blue
+        c[ImGuiCol_Button]           = ImVec4(0.24f, 0.44f, 0.63f, 1.00f);
+        c[ImGuiCol_ButtonHovered]    = ImVec4(0.39f, 0.60f, 0.86f, 1.00f);
+        c[ImGuiCol_ButtonActive]     = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+
+        // Headers
+        c[ImGuiCol_Header]           = ImVec4(0.24f, 0.44f, 0.63f, 1.00f);
+        c[ImGuiCol_HeaderHovered]    = ImVec4(0.39f, 0.60f, 0.86f, 1.00f);
+        c[ImGuiCol_HeaderActive]     = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+
+        // Check mark
+        c[ImGuiCol_CheckMark]        = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    }
 
     // ---------------------------------------------------------------------
     // App state
@@ -157,9 +251,9 @@ int main() {
                     if (key->code == sf::Keyboard::Key::R)
                         generate();
                     else if (key->code == sf::Keyboard::Key::Escape) {
-                        window.setSize({ 400, 245 });
-                        window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { 400.f, 245.f })));
-                        centerWindow(400, 245);
+                        window.setSize({ (unsigned)uiW, (unsigned)uiH });
+                        window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { (float)uiW, (float)uiH })));
+                        centerWindow(uiW, uiH);
                         window.setTitle("Maze Solver - Settings");
                         state = AppState::Settings;
                     }
@@ -174,25 +268,26 @@ int main() {
         // ------------------------------------------------------------------
         if (state == AppState::Settings) {
             ImGui::SetNextWindowPos({ 0, 0 });
-            ImGui::SetNextWindowSize({ 400, 245 });
+            ImGui::SetNextWindowSize({ (float)uiW, (float)uiH });
             ImGui::Begin("Maze Settings", nullptr,
                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
+                ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
             ImGui::Text("Maze Solver");
             ImGui::Separator();
             ImGui::Spacing();
 
-            ImGui::Text("Columns"); ImGui::SameLine(120);
-            ImGui::SetNextItemWidth(200);
+            ImGui::Text("Columns"); ImGui::SameLine(uiLabelW);
+            ImGui::SetNextItemWidth(uiSliderW);
             ImGui::SliderInt("##cols", &cols, 21, 601);
 
-            ImGui::Text("Rows"); ImGui::SameLine(120);
-            ImGui::SetNextItemWidth(200);
+            ImGui::Text("Rows"); ImGui::SameLine(uiLabelW);
+            ImGui::SetNextItemWidth(uiSliderW);
             ImGui::SliderInt("##rows", &rows, 21, 401);
 
-            ImGui::Text("Speed"); ImGui::SameLine(120);
-            ImGui::SetNextItemWidth(200);
+            ImGui::Text("Speed"); ImGui::SameLine(uiLabelW);
+            ImGui::SetNextItemWidth(uiSliderW);
             ImGui::SliderFloat("##speed", &stepMs, 0.1f, 20.0f, "%.1f ms/step");
 
             // Ensure odd values (maze algorithm requires it)
@@ -208,7 +303,7 @@ int main() {
             }
             ImGui::Spacing();
 
-            if (ImGui::Button("Generate", { 120, 32 }))
+            if (ImGui::Button("Generate", { uiBtnW, uiBtnH }))
                 generate();
 
             ImGui::End();
@@ -220,7 +315,7 @@ int main() {
         }
 
         // ------------------------------------------------------------------
-        // Running: animate solver — batch steps to stay frame-rate independent
+        // Running: animate solver - batch steps to stay frame-rate independent
         // ------------------------------------------------------------------
         if (phase == Phase::Visiting) {
             auto currentVisited = solver->getVisited();

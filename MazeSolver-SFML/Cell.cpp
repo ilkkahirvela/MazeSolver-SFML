@@ -4,7 +4,7 @@
 Cell::Cell(int x, int y, int size, bool blocked)
     : x(x), y(y), isBlocked(blocked)
 {
-    // At small cell sizes drop the gap and outline — shape would be 0x0 otherwise
+    // At small cell sizes drop the gap and outline - shape would be 0x0 otherwise
     float inset = (size >= 4) ? 1.f : 0.f;
     shape.setSize(sf::Vector2f(size - 2 * inset, size - 2 * inset));
     shape.setPosition(sf::Vector2f(x * size + inset, y * size + inset));
