@@ -100,12 +100,10 @@ $(function(){initNavTree('class_cell.html','','class_cell-members'); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab8e3c58af30b3bb2d025b7ddbabfddcf" id="r_ab8e3c58af30b3bb2d025b7ddbabfddcf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8e3c58af30b3bb2d025b7ddbabfddcf">Cell</a> (int <a class="el" href="#ac008158796a0bfdf37be2f26eff651ef">x</a>, int y, int size, bool blocked=false)</td></tr>
+<tr class="memitem:ab8e3c58af30b3bb2d025b7ddbabfddcf" id="r_ab8e3c58af30b3bb2d025b7ddbabfddcf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8e3c58af30b3bb2d025b7ddbabfddcf">Cell</a> (int <a class="el" href="#ac008158796a0bfdf37be2f26eff651ef">x</a>, int <a class="el" href="#ab99a0cead05c6b8129ddf3231b11c1ad">y</a>, int size, bool blocked=false)</td></tr>
 <tr class="memdesc:ab8e3c58af30b3bb2d025b7ddbabfddcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a cell at the given grid position.  <br /></td></tr>
 <tr class="memitem:a34f05be3d346b04f5a1c0037a52319cd" id="r_a34f05be3d346b04f5a1c0037a52319cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34f05be3d346b04f5a1c0037a52319cd">setBlocked</a> (bool blocked)</td></tr>
 <tr class="memdesc:a34f05be3d346b04f5a1c0037a52319cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set whether the cell is blocked.  <br /></td></tr>
-<tr class="memitem:a93e3a15c6975796adab41c4d576c44be" id="r_a93e3a15c6975796adab41c4d576c44be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93e3a15c6975796adab41c4d576c44be">setVisited</a> (bool <a class="el" href="#ac0fdf52adc7d9dd8c5de95635ff04de3">visited</a>)</td></tr>
-<tr class="memdesc:a93e3a15c6975796adab41c4d576c44be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the cell as visited or not.  <br /></td></tr>
 <tr class="memitem:aebb6235ff56364cf5568af5e47f440c6" id="r_aebb6235ff56364cf5568af5e47f440c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebb6235ff56364cf5568af5e47f440c6">draw</a> (sf::RenderTarget &amp;target)</td></tr>
 <tr class="memdesc:aebb6235ff56364cf5568af5e47f440c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw the cell on the given render target.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -113,22 +111,20 @@ Public Member Functions</h2></td></tr>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ac008158796a0bfdf37be2f26eff651ef" id="r_ac008158796a0bfdf37be2f26eff651ef"><td class="memItemLeft" align="right" valign="top"><a id="ac008158796a0bfdf37be2f26eff651ef" name="ac008158796a0bfdf37be2f26eff651ef"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>x</b></td></tr>
-<tr class="memdesc:ac008158796a0bfdf37be2f26eff651ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grid coordinates. <br /></td></tr>
+<tr class="memdesc:ac008158796a0bfdf37be2f26eff651ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Column index in the maze grid. <br /></td></tr>
 <tr class="memitem:ab99a0cead05c6b8129ddf3231b11c1ad" id="r_ab99a0cead05c6b8129ddf3231b11c1ad"><td class="memItemLeft" align="right" valign="top"><a id="ab99a0cead05c6b8129ddf3231b11c1ad" name="ab99a0cead05c6b8129ddf3231b11c1ad"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>y</b></td></tr>
+<tr class="memdesc:ab99a0cead05c6b8129ddf3231b11c1ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Row index in the maze grid. <br /></td></tr>
 <tr class="memitem:a52a5cee3909c2f1f2f905cdde8ea8855" id="r_a52a5cee3909c2f1f2f905cdde8ea8855"><td class="memItemLeft" align="right" valign="top"><a id="a52a5cee3909c2f1f2f905cdde8ea8855" name="a52a5cee3909c2f1f2f905cdde8ea8855"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isBlocked</b></td></tr>
 <tr class="memdesc:a52a5cee3909c2f1f2f905cdde8ea8855"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this cell is blocked (wall) or open (path) <br /></td></tr>
-<tr class="memitem:ac0fdf52adc7d9dd8c5de95635ff04de3" id="r_ac0fdf52adc7d9dd8c5de95635ff04de3"><td class="memItemLeft" align="right" valign="top"><a id="ac0fdf52adc7d9dd8c5de95635ff04de3" name="ac0fdf52adc7d9dd8c5de95635ff04de3"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>visited</b></td></tr>
-<tr class="memdesc:ac0fdf52adc7d9dd8c5de95635ff04de3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether this cell has been visited during solving (for debugging/visualization) <br /></td></tr>
 <tr class="memitem:ab7140549693a6e055079fbc4259da185" id="r_ab7140549693a6e055079fbc4259da185"><td class="memItemLeft" align="right" valign="top"><a id="ab7140549693a6e055079fbc4259da185" name="ab7140549693a6e055079fbc4259da185"></a>
 sf::RectangleShape&#160;</td><td class="memItemRight" valign="bottom"><b>shape</b></td></tr>
 <tr class="memdesc:ab7140549693a6e055079fbc4259da185"><td class="mdescLeft">&#160;</td><td class="mdescRight">SFML shape used to draw this cell. <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a single grid cell in the maze. </p>
-<p>Each cell stores its grid position, state (blocked or open, visited or not), and a rectangle shape for rendering with SFML. </p>
+<p>Each cell stores its grid position, blocked/open state, and a rectangle shape for rendering with SFML. </p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab8e3c58af30b3bb2d025b7ddbabfddcf" name="ab8e3c58af30b3bb2d025b7ddbabfddcf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab8e3c58af30b3bb2d025b7ddbabfddcf">&#9670;&#160;</a></span>Cell()</h2>
@@ -222,33 +218,6 @@ sf::RectangleShape&#160;</td><td class="memItemRight" valign="bottom"><b>shape</
 </dl>
 <p>&lt; Walls are black</p>
 <p>&lt; Open cells are white</p>
-
-</div>
-</div>
-<a id="a93e3a15c6975796adab41c4d576c44be" name="a93e3a15c6975796adab41c4d576c44be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93e3a15c6975796adab41c4d576c44be">&#9670;&#160;</a></span>setVisited()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Cell::setVisited </td>
-          <td>(</td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visited</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Mark the cell as visited or not. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">visited</td><td>True if visited, false otherwise. </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>&lt; Highlight visited cells (debug/visualization)</p>
-<p>&lt; Reset to normal appearance</p>
 
 </div>
 </div>

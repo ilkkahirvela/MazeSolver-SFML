@@ -5,13 +5,13 @@
  * @class Cell
  * @brief Represents a single grid cell in the maze.
  *
- * Each cell stores its grid position, state (blocked or open, visited or not),
+ * Each cell stores its grid position, blocked/open state,
  * and a rectangle shape for rendering with SFML.
  */
 class Cell {
 public:
-    /// Grid coordinates
-    int x, y;
+    int x; ///< Column index in the maze grid
+    int y; ///< Row index in the maze grid
 
     /// Whether this cell is blocked (wall) or open (path)
     bool isBlocked;

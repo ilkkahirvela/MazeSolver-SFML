@@ -1,9 +1,4 @@
 var searchData=
 [
-  ['setblocked_0',['setBlocked',['../class_cell.html#a34f05be3d346b04f5a1c0037a52319cd',1,'Cell']]],
-  ['setvisited_1',['setVisited',['../class_cell.html#a93e3a15c6975796adab41c4d576c44be',1,'Cell']]],
-  ['shape_2',['shape',['../class_cell.html#ab7140549693a6e055079fbc4259da185',1,'Cell']]],
-  ['solver_3',['Solver',['../class_solver.html',1,'Solver'],['../class_solver.html#afdaa67ae3ea8c9a8105692cfe6a5a854',1,'Solver::Solver()']]],
-  ['solver_20visualization_4',['Maze Solver Visualization',['../index.html',1,'']]],
-  ['start_5',['start',['../class_solver.html#a97bc7169c18b339fecd4937150f907c3',1,'Solver']]]
+  ['operator_28_29_0',['operator()',['../struct_pair_hash.html#a810d39372e94a04b665eea42de0a7327',1,'PairHash']]]
 ];

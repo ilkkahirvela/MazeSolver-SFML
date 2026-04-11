@@ -102,6 +102,8 @@ $(function(){initNavTree('class_maze.html','','class_maze-members'); });
 Public Member Functions</h2></td></tr>
 <tr class="memitem:acf513f22732b388b5e2df3941b729f28" id="r_acf513f22732b388b5e2df3941b729f28"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf513f22732b388b5e2df3941b729f28">Maze</a> (int cols, int rows, int cellSize)</td></tr>
 <tr class="memdesc:acf513f22732b388b5e2df3941b729f28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a maze with given dimensions.  <br /></td></tr>
+<tr class="memitem:aa3f5d822046f02e7a8ddf9dc2fba9a66" id="r_aa3f5d822046f02e7a8ddf9dc2fba9a66"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3f5d822046f02e7a8ddf9dc2fba9a66">reset</a> ()</td></tr>
+<tr class="memdesc:aa3f5d822046f02e7a8ddf9dc2fba9a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset all cells back to blocked (wall) state.  <br /></td></tr>
 <tr class="memitem:a8c1641f0761457416e343e3ea70c567b" id="r_a8c1641f0761457416e343e3ea70c567b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c1641f0761457416e343e3ea70c567b">generate</a> ()</td></tr>
 <tr class="memdesc:a8c1641f0761457416e343e3ea70c567b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a randomized maze using recursive backtracking.  <br /></td></tr>
 <tr class="memitem:aca702a435fc5b61d9b33bde0c09ba312" id="r_aca702a435fc5b61d9b33bde0c09ba312"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca702a435fc5b61d9b33bde0c09ba312">draw</a> (sf::RenderTarget &amp;target)</td></tr>
@@ -259,6 +261,26 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getCols</b> () const</
 
 <p>Access the underlying grid of cells. </p>
 <dl class="section return"><dt>Returns</dt><dd>Reference to 2D vector of cells. </dd></dl>
+
+</div>
+</div>
+<a id="aa3f5d822046f02e7a8ddf9dc2fba9a66" name="aa3f5d822046f02e7a8ddf9dc2fba9a66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3f5d822046f02e7a8ddf9dc2fba9a66">&#9670;&#160;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Maze::reset </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reset all cells back to blocked (wall) state. </p>
+<p>Call before <a class="el" href="#a8c1641f0761457416e343e3ea70c567b" title="Generate a randomized maze using recursive backtracking.">generate()</a> to produce a fresh maze in the same grid. </p>
 
 </div>
 </div>

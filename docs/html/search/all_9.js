@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['usage_0',['Usage',['../index.html#usage_sec',1,'']]]
+  ['pairhash_0',['PairHash',['../struct_pair_hash.html',1,'']]]
 ];

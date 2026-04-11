@@ -93,11 +93,14 @@ $(function(){initNavTree('_app_8cpp.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> generation and solver visualization using SFML.  
+<p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> generation and solver visualization using SFML and Dear ImGui.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;Maze.hpp&quot;</code><br />
 <code>#include &quot;Solver.hpp&quot;</code><br />
 <code>#include &lt;SFML/Graphics.hpp&gt;</code><br />
+<code>#include &lt;imgui.h&gt;</code><br />
+<code>#include &lt;imgui-SFML.h&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -105,13 +108,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point of the application.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> generation and solver visualization using SFML. </p>
-<p>This program generates a maze, solves it using BFS in a separate thread, and visualizes the solving process in real time.</p>
-<p>Features:</p><ul>
-<li>Static rendering of maze walls (drawn once into a render texture).</li>
-<li>Dynamic rendering of visited cells (light blue) and final path (red).</li>
-<li>Step-by-step animated visualization. </li>
-</ul>
+<div class="textblock"><p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> generation and solver visualization using SFML and Dear ImGui. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="ae66f6b31b5ad750f1fe042a706a4e3d4" name="ae66f6b31b5ad750f1fe042a706a4e3d4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">&#9670;&#160;</a></span>main()</h2>
@@ -129,22 +126,12 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Main entry point of the application. </p>
-<p>Initializes a window, generates a maze, starts the solver in a separate thread, and animates the solving process using SFML graphics.</p>
+<p>Opens a settings panel (Dear ImGui) where the user configures maze dimensions and animation speed. On generate, the maze is built and BFS runs in a background thread while the solving process is animated in real time.</p>
+<p>Keybindings during solving:</p><ul>
+<li>R: regenerate a new maze with the same settings</li>
+<li>Esc: return to the settings panel</li>
+</ul>
 <dl class="section return"><dt>Returns</dt><dd>int Exit status code. </dd></dl>
-<p><a class="el" href="class_maze.html" title="Represents a 2D maze grid and handles generation and rendering.">Maze</a> grid size and cell dimensions</p>
-<p>Create the SFML render window</p>
-<p>Initialize and generate the maze</p>
-<p>Create solver and start it in a background thread</p>
-<p>&lt; Draw entire maze once</p>
-<p>&lt; Timer for controlling animation speed</p>
-<p>&lt; Delay between animation steps (ms)</p>
-<p>&lt; Index of current visited cell</p>
-<p>&lt; Index of current path cell</p>
-<p>&lt; Shared pointer to solution path</p>
-<p><a class="el" href="class_solver.html" title="Solves a generated maze using Breadth-First Search (BFS).">Solver</a> phase (Visiting cells or showing final Path)</p>
-<p>&lt; Static maze walls</p>
-<p>&lt; Incrementally drawn visited + path cells</p>
-<p>Ensure solver thread is joined before exiting</p>
 
 </div>
 </div>

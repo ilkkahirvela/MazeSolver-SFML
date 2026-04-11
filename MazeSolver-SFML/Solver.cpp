@@ -6,7 +6,9 @@
 /// Directions for BFS (right, left, down, up).
 static const std::pair<int, int> DIRS4[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 
+/// Hash functor for std::pair<int,int>, used by the BFS unordered_map.
 struct PairHash {
+    /// Combines hashes of the two integers using XOR and bit shift.
     std::size_t operator()(const std::pair<int, int>& p) const {
         return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 16);
     }
