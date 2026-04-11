@@ -37,6 +37,96 @@
 #include <imgui-SFML.h>
 #include <memory>
 
+// -----------------------------------------------------------------------------
+// NavKey - tracks press and hold state for smooth velocity-based navigation
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief Tracks a single key's press and hold state for velocity-based UI navigation.
+ *
+ * On the first frame the key is pressed, @c justPressed is true and can be used
+ * to fire a single minimum step. On subsequent frames while held, @c heldSecs()
+ * drives a velocity ramp for smooth continuous movement.
+ */
+struct NavKey {
+    bool      wasDown     = false;
+    bool      justPressed = false; ///< True for one frame on initial press
+    sf::Clock held;
+
+    /// Poll the key state and update internal flags. Call once per frame.
+    void update(sf::Keyboard::Key key) {
+        justPressed = false;
+        bool down = sf::Keyboard::isKeyPressed(key);
+        if (!down) { wasDown = false; return; }
+        if (!wasDown) { wasDown = true; justPressed = true; held.restart(); }
+    }
+
+    /// Seconds the key has been held continuously (0 if not held).
+    float heldSecs() const {
+        return wasDown ? held.getElapsedTime().asSeconds() : 0.f;
+    }
+};
+
+// -----------------------------------------------------------------------------
+// applyImGuiStyle - dark theme matching maze colors (sharp, no rounding)
+// Palette:
+//   bg     #141414  (maze wall black)
+//   frame  #282828  (slightly lighter)
+//   accent #96C8FF  (150,200,255 - visited cell blue)
+//   btn    #3D6FA0  (deeper blue for resting button)
+//   text   #FFFFFF  (open cell white)
+// -----------------------------------------------------------------------------
+
+/**
+ * @brief Applies the application's dark ImGui theme, scaled for screen resolution.
+ * @param scale Ratio of desktop height to 1080p (used to scale padding and fonts).
+ */
+static void applyImGuiStyle(float scale) {
+    ImGui::StyleColorsDark();
+    auto& s = ImGui::GetStyle();
+
+    s.WindowRounding    = 0.0f;
+    s.FrameRounding     = 0.0f;
+    s.GrabRounding      = 0.0f;
+    s.ScrollbarRounding = 0.0f;
+    s.TabRounding       = 0.0f;
+    s.PopupRounding     = 0.0f;
+    s.ChildRounding     = 0.0f;
+    s.WindowBorderSize  = 0.0f;
+    s.FrameBorderSize   = 0.0f;
+    s.WindowPadding     = ImVec2(std::round(18.f * scale), std::round(18.f * scale));
+    s.FramePadding      = ImVec2(std::round(8.f  * scale), std::round(5.f  * scale));
+    s.ItemSpacing       = ImVec2(std::round(10.f * scale), std::round(10.f * scale));
+    s.GrabMinSize       = std::round(10.f * scale);
+
+    ImVec4* c = s.Colors;
+    c[ImGuiCol_WindowBg]             = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+    c[ImGuiCol_PopupBg]              = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+    c[ImGuiCol_Text]                 = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+    c[ImGuiCol_TextDisabled]         = ImVec4(0.45f, 0.55f, 0.65f, 1.00f);
+    c[ImGuiCol_FrameBg]              = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
+    c[ImGuiCol_FrameBgHovered]       = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+    c[ImGuiCol_FrameBgActive]        = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    c[ImGuiCol_Separator]            = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+    c[ImGuiCol_SeparatorHovered]     = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    c[ImGuiCol_SeparatorActive]      = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    c[ImGuiCol_SliderGrab]           = ImVec4(0.45f, 0.65f, 0.90f, 1.00f);
+    c[ImGuiCol_SliderGrabActive]     = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // red while dragging
+    c[ImGuiCol_ScrollbarBg]          = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    c[ImGuiCol_ScrollbarGrab]        = ImVec4(0.45f, 0.65f, 0.90f, 1.00f);
+    c[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    c[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    c[ImGuiCol_Button]               = ImVec4(0.24f, 0.44f, 0.63f, 1.00f);
+    c[ImGuiCol_ButtonHovered]        = ImVec4(0.39f, 0.60f, 0.86f, 1.00f);
+    c[ImGuiCol_ButtonActive]         = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    c[ImGuiCol_Header]               = ImVec4(0.24f, 0.44f, 0.63f, 1.00f);
+    c[ImGuiCol_HeaderHovered]        = ImVec4(0.39f, 0.60f, 0.86f, 1.00f);
+    c[ImGuiCol_HeaderActive]         = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+    c[ImGuiCol_CheckMark]            = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
+}
+
+// -----------------------------------------------------------------------------
+
 /**
  * @brief Main entry point of the application.
  *
@@ -51,19 +141,12 @@
  * @return int Exit status code.
  */
 int main() {
-    // ---------------------------------------------------------------------
-    // Settings (configurable via ImGui panel)
-    // ---------------------------------------------------------------------
-    int cols = 201;
-    int rows = 151;
-
-    // ---------------------------------------------------------------------
-    // Scale all UI dimensions relative to 1080p
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // UI dimensions - scaled relative to 1080p
+    // -------------------------------------------------------------------------
     const float scale = std::max(0.5f, std::min(
         (float)sf::VideoMode::getDesktopMode().size.y / 1080.f, 3.0f
     ));
-
     const int   taskbarHeight = (int)(80  * scale);
     const int   uiW           = (int)(400 * scale);
     const int   uiH           = (int)(285 * scale);
@@ -72,162 +155,69 @@ int main() {
     const float uiBtnW        = std::round(120.f * scale);
     const float uiBtnH        = std::round(32.f  * scale);
 
-    // ---------------------------------------------------------------------
-    // Initial window - sized to settings panel only, resized on generate
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // Window + ImGui setup
+    // -------------------------------------------------------------------------
     sf::RenderWindow window(
         sf::VideoMode({ (unsigned)uiW, (unsigned)uiH }),
         "Maze Solver - Settings"
     );
     window.setFramerateLimit(60);
 
-    // Center window on screen, leaving room for the taskbar at the bottom
     auto centerWindow = [&](int w, int h) {
         auto desktop = sf::VideoMode::getDesktopMode();
         int x = ((int)desktop.size.x - w) / 2;
         int y = ((int)desktop.size.y - taskbarHeight - h) / 2;
         window.setPosition(sf::Vector2i(std::max(0, x), std::max(0, y)));
     };
-
     centerWindow(uiW, uiH);
 
     (void)ImGui::SFML::Init(window);
-
-    // ---------------------------------------------------------------------
-    // Font - Segoe UI, fall back to ImGui default if unavailable
-    // ---------------------------------------------------------------------
     {
         ImGuiIO& io = ImGui::GetIO();
         (void)io.Fonts->Clear();
         ImFont* font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/consola.ttf", std::round(17.f * scale));
         if (font) (void)ImGui::SFML::UpdateFontTexture();
     }
+    applyImGuiStyle(scale);
 
-    // ---------------------------------------------------------------------
-    // Style - dark theme matching maze colors
-    // Palette:
-    //   bg         #141414  (maze wall black)
-    //   frame      #282828  (slightly lighter)
-    //   accent     #96C8FF  (150,200,255 - visited cell blue)
-    //   btn        #3D6FA0  (deeper blue for resting button)
-    //   text       #FFFFFF  (open cell white)
-    // ---------------------------------------------------------------------
-    {
-        ImGui::StyleColorsDark();
-        auto& s = ImGui::GetStyle();
-
-        s.WindowRounding    = 0.0f;
-        s.FrameRounding     = 0.0f;
-        s.GrabRounding      = 0.0f;
-        s.ScrollbarRounding = 0.0f;
-        s.TabRounding       = 0.0f;
-        s.PopupRounding     = 0.0f;
-        s.ChildRounding     = 0.0f;
-        s.WindowBorderSize  = 0.0f;
-        s.FrameBorderSize   = 0.0f;
-        s.WindowPadding     = ImVec2(std::round(18.f * scale), std::round(18.f * scale));
-        s.FramePadding      = ImVec2(std::round(8.f  * scale), std::round(5.f  * scale));
-        s.ItemSpacing       = ImVec2(std::round(10.f * scale), std::round(10.f * scale));
-        s.GrabMinSize       = std::round(10.f * scale);
-
-        ImVec4* c = s.Colors;
-
-        // Background / panels
-        c[ImGuiCol_WindowBg]         = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
-        c[ImGuiCol_PopupBg]          = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
-
-        // Text
-        c[ImGuiCol_Text]             = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        c[ImGuiCol_TextDisabled]     = ImVec4(0.45f, 0.55f, 0.65f, 1.00f);
-
-        // Frames (slider bg, input bg)
-        c[ImGuiCol_FrameBg]          = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
-        c[ImGuiCol_FrameBgHovered]   = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-        c[ImGuiCol_FrameBgActive]    = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-
-        // Separator / border
-        c[ImGuiCol_Separator]        = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-        c[ImGuiCol_SeparatorHovered] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-        c[ImGuiCol_SeparatorActive]  = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-
-        // Slider grab - visited cell blue
-        c[ImGuiCol_SliderGrab]       = ImVec4(0.45f, 0.65f, 0.90f, 1.00f);
-        c[ImGuiCol_SliderGrabActive] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-
-        // Scrollbar
-        c[ImGuiCol_ScrollbarBg]      = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-        c[ImGuiCol_ScrollbarGrab]    = ImVec4(0.45f, 0.65f, 0.90f, 1.00f);
-        c[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-        c[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-
-        // Buttons - resting is a muted blue, hover/active rise to visited-cell blue
-        c[ImGuiCol_Button]           = ImVec4(0.24f, 0.44f, 0.63f, 1.00f);
-        c[ImGuiCol_ButtonHovered]    = ImVec4(0.39f, 0.60f, 0.86f, 1.00f);
-        c[ImGuiCol_ButtonActive]     = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-
-        // Headers
-        c[ImGuiCol_Header]           = ImVec4(0.24f, 0.44f, 0.63f, 1.00f);
-        c[ImGuiCol_HeaderHovered]    = ImVec4(0.39f, 0.60f, 0.86f, 1.00f);
-        c[ImGuiCol_HeaderActive]     = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-
-        // Check mark
-        c[ImGuiCol_CheckMark]        = ImVec4(0.59f, 0.78f, 1.00f, 1.00f);
-    }
-
-    // ---------------------------------------------------------------------
-    // App state
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // Application state
+    // -------------------------------------------------------------------------
     enum class AppState { Settings, Running };
     AppState state = AppState::Settings;
+
+    int   cols   = 201;
+    int   rows   = 151;
+    float stepMs = 0.5f;
 
     std::unique_ptr<Maze>   maze;
     std::unique_ptr<Solver> solver;
 
-    sf::RenderTexture            staticLayer;
-    sf::RenderTexture            dynamicLayer;
-    std::optional<sf::Sprite>    mazeBackground;
-    std::optional<sf::Sprite>    dynamicOverlay;
+    sf::RenderTexture         staticLayer;
+    sf::RenderTexture         dynamicLayer;
+    std::optional<sf::Sprite> mazeBackground;
+    std::optional<sf::Sprite> dynamicOverlay;
 
-    sf::Clock animClock;
-    float stepMs = 0.5f;
+    enum class Phase { Visiting, Path };
+    Phase       phase        = Phase::Visiting;
     std::size_t visitedIndex = 0;
     std::size_t pathIndex    = 0;
     std::shared_ptr<const std::vector<Cell*>> pathPtr;
+    sf::Clock   animClock;
 
-    enum class Phase { Visiting, Path };
-    Phase phase = Phase::Visiting;
+    int    focusedSlider = 0;
+    bool   keyboardNav   = false;
+    NavKey leftNav, rightNav;
+    sf::Clock navClock;
+    float     colFrac = 0.f;
+    float     rowFrac = 0.f;
 
-    sf::Clock deltaClock; // for ImGui::SFML::Update
+    sf::Clock deltaClock;
 
-    // ---------------------------------------------------------------------
-    // Keyboard navigation state (settings panel)
-    // ---------------------------------------------------------------------
-    int  focusedSlider = 0;    // 0 = Columns, 1 = Rows, 2 = Speed
-    bool keyboardNav   = false; // true while keyboard is the active input device
-
-    // Tracks press and hold state for smooth velocity-based navigation.
-    struct NavKey {
-        bool      wasDown    = false;
-        bool      justPressed = false; // true for one frame on initial press
-        sf::Clock held;
-        void update(sf::Keyboard::Key key) {
-            justPressed = false;
-            bool down = sf::Keyboard::isKeyPressed(key);
-            if (!down) { wasDown = false; return; }
-            if (!wasDown) { wasDown = true; justPressed = true; held.restart(); }
-        }
-        float heldSecs() const {
-            return wasDown ? held.getElapsedTime().asSeconds() : 0.f;
-        }
-    } leftNav, rightNav;
-
-    sf::Clock navClock;       // frame delta for velocity integration
-    float     colFrac = 0.f;  // fractional column accumulator
-    float     rowFrac = 0.f;  // fractional row accumulator
-
-    // ---------------------------------------------------------------------
-    // Lambda: start a new maze with current settings
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // generate - builds a new maze and starts the solver
+    // -------------------------------------------------------------------------
     auto generate = [&]() {
         if (solver) { solver->join(); solver.reset(); }
 
@@ -271,9 +261,152 @@ int main() {
         state = AppState::Running;
     };
 
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // drawSettings - renders the settings panel and handles keyboard navigation
+    // -------------------------------------------------------------------------
+    auto drawSettings = [&]() {
+        ImGui::SetNextWindowPos({ 0, 0 });
+        ImGui::SetNextWindowSize({ (float)uiW, (float)uiH });
+        ImGui::Begin("Maze Settings", nullptr,
+            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+        ImGui::Text("Maze Solver");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        // Velocity-based keyboard navigation for left/right
+        float dt = navClock.restart().asSeconds();
+        leftNav.update(sf::Keyboard::Key::Left);
+        rightNav.update(sf::Keyboard::Key::Right);
+
+        if (leftNav.justPressed || rightNav.justPressed) keyboardNav = true;
+
+        int tapDir  = (rightNav.justPressed ? 1 : 0) - (leftNav.justPressed ? 1 : 0);
+        int holdDir = (!rightNav.justPressed && rightNav.wasDown ? 1 : 0)
+                    - (!leftNav.justPressed  && leftNav.wasDown  ? 1 : 0);
+
+        if (holdDir == 0) { colFrac = rowFrac = 0.f; }
+
+        if (tapDir != 0) {
+            if      (focusedSlider == 0) cols   = std::clamp(cols + tapDir * 2, 21, 601);
+            else if (focusedSlider == 1) rows   = std::clamp(rows + tapDir * 2, 21, 401);
+            else                         stepMs = std::clamp(std::round((stepMs + tapDir * 0.1f) * 10.f) / 10.f, 0.1f, 20.0f);
+        }
+
+        if (holdDir != 0) {
+            float secs = std::max(leftNav.heldSecs(), rightNav.heldSecs());
+            float ramp = std::clamp((secs - 0.25f) / 1.5f, 0.f, 1.f);
+            if (focusedSlider == 0) {
+                colFrac += holdDir * ramp * 200.f * dt;
+                while (colFrac >=  2.f) { cols = std::clamp(cols + 2, 21, 601); colFrac -= 2.f; }
+                while (colFrac <= -2.f) { cols = std::clamp(cols - 2, 21, 601); colFrac += 2.f; }
+            } else if (focusedSlider == 1) {
+                rowFrac += holdDir * ramp * 150.f * dt;
+                while (rowFrac >=  2.f) { rows = std::clamp(rows + 2, 21, 401); rowFrac -= 2.f; }
+                while (rowFrac <= -2.f) { rows = std::clamp(rows - 2, 21, 401); rowFrac += 2.f; }
+            } else {
+                stepMs = std::clamp(std::round((stepMs + holdDir * ramp * 30.f * dt) * 10.f) / 10.f, 0.1f, 20.0f);
+            }
+        }
+
+        // Sliders - highlight focused row; turn grab red while keyboard is moving it
+        const ImVec4 focusBg(0.25f, 0.42f, 0.62f, 1.00f);
+        const ImVec4 grabRed(1.00f, 0.00f, 0.00f, 1.00f);
+        const bool   keyMoving = keyboardNav && (tapDir != 0 || holdDir != 0);
+
+        auto pushSliderColors = [&](int idx) {
+            int n = 0;
+            if (keyboardNav && focusedSlider == idx) { ImGui::PushStyleColor(ImGuiCol_FrameBg,    focusBg); n++; }
+            if (keyMoving   && focusedSlider == idx) { ImGui::PushStyleColor(ImGuiCol_SliderGrab, grabRed); n++; }
+            return n;
+        };
+
+        ImGui::Text("Columns"); ImGui::SameLine(uiLabelW);
+        ImGui::SetNextItemWidth(uiSliderW);
+        int n = pushSliderColors(0);
+        ImGui::SliderInt("##cols", &cols, 21, 601);
+        ImGui::PopStyleColor(n);
+        if (ImGui::IsItemHovered()) focusedSlider = 0;
+
+        ImGui::Text("Rows"); ImGui::SameLine(uiLabelW);
+        ImGui::SetNextItemWidth(uiSliderW);
+        n = pushSliderColors(1);
+        ImGui::SliderInt("##rows", &rows, 21, 401);
+        ImGui::PopStyleColor(n);
+        if (ImGui::IsItemHovered()) focusedSlider = 1;
+
+        ImGui::Text("Speed"); ImGui::SameLine(uiLabelW);
+        ImGui::SetNextItemWidth(uiSliderW);
+        n = pushSliderColors(2);
+        ImGui::SliderFloat("##speed", &stepMs, 0.1f, 20.0f, "%.1f ms/step");
+        ImGui::PopStyleColor(n);
+        if (ImGui::IsItemHovered()) focusedSlider = 2;
+
+        // Ensure odd values (maze algorithm requires it)
+        if (cols % 2 == 0) cols++;
+        if (rows % 2 == 0) rows++;
+
+        // Preview cell size and window resolution
+        auto desktop = sf::VideoMode::getDesktopMode();
+        int preview = std::max(1, std::min((int)desktop.size.x / cols, ((int)desktop.size.y - taskbarHeight) / rows));
+        ImGui::Spacing();
+        ImGui::TextDisabled("Cell size: %dpx  |  Window: %d x %d", preview, cols * preview, rows * preview);
+        ImGui::Spacing();
+
+        if (ImGui::Button("Generate", { uiBtnW, uiBtnH }))
+            generate();
+
+        ImGui::End();
+    };
+
+    // -------------------------------------------------------------------------
+    // stepAnimation - advances the BFS visited/path animation each frame
+    // -------------------------------------------------------------------------
+    auto stepAnimation = [&]() {
+        if (phase == Phase::Visiting) {
+            auto currentVisited = solver->getVisited();
+            int steps = std::max(1, (int)(animClock.getElapsedTime().asMilliseconds() / stepMs));
+            bool drew = false;
+            for (int i = 0; i < steps && visitedIndex < currentVisited.size(); ++i) {
+                Cell* c = currentVisited[visitedIndex++];
+                c->shape.setFillColor(sf::Color(150, 200, 255));
+                c->shape.setOutlineColor(sf::Color(150, 200, 255));
+                dynamicLayer.draw(c->shape);
+                drew = true;
+            }
+            if (drew) { dynamicLayer.display(); animClock.restart(); }
+
+            if (visitedIndex >= currentVisited.size() && solver->isFinished() && solver->foundPath()) {
+                pathPtr = solver->getPath();
+                pathIndex = 0;
+                phase = Phase::Path;
+                animClock.restart();
+            }
+            else if (visitedIndex >= currentVisited.size() && solver->isFinished() && !solver->foundPath()) {
+                window.setTitle("Maze Solver - No path found!");
+            }
+        }
+        else if (phase == Phase::Path && pathPtr) {
+            int steps = std::max(1, (int)(animClock.getElapsedTime().asMilliseconds() / stepMs));
+            bool drew = false;
+            for (int i = 0; i < steps && pathIndex < pathPtr->size(); ++i) {
+                Cell* c = (*pathPtr)[pathIndex++];
+                c->shape.setFillColor(sf::Color::Red);
+                c->shape.setOutlineColor(sf::Color::Red);
+                dynamicLayer.draw(c->shape);
+                drew = true;
+            }
+            if (drew) { dynamicLayer.display(); animClock.restart(); }
+            if (pathIndex >= pathPtr->size())
+                window.setTitle("Maze Solver - Done!");
+        }
+    };
+
+    // -------------------------------------------------------------------------
     // Main loop
-    // ---------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     while (window.isOpen()) {
         while (const std::optional event = window.pollEvent()) {
             ImGui::SFML::ProcessEvent(window, *event);
@@ -313,150 +446,15 @@ int main() {
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        // ------------------------------------------------------------------
-        // Settings panel
-        // ------------------------------------------------------------------
         if (state == AppState::Settings) {
-            ImGui::SetNextWindowPos({ 0, 0 });
-            ImGui::SetNextWindowSize({ (float)uiW, (float)uiH });
-            ImGui::Begin("Maze Settings", nullptr,
-                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar |
-                ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-            ImGui::Text("Maze Solver");
-            ImGui::Separator();
-            ImGui::Spacing();
-
-            // Velocity-based keyboard navigation for left/right
-            {
-                float dt = navClock.restart().asSeconds();
-                leftNav.update(sf::Keyboard::Key::Left);
-                rightNav.update(sf::Keyboard::Key::Right);
-
-                if (leftNav.justPressed || rightNav.justPressed) keyboardNav = true;
-
-                int tapDir  = (rightNav.justPressed ? 1 : 0) - (leftNav.justPressed ? 1 : 0);
-                int holdDir = (!rightNav.justPressed && rightNav.wasDown ? 1 : 0)
-                            - (!leftNav.justPressed  && leftNav.wasDown  ? 1 : 0);
-
-                if (holdDir == 0) { colFrac = rowFrac = 0.f; }
-
-                // Single tap: minimum step
-                if (tapDir != 0) {
-                    if      (focusedSlider == 0) cols   = std::clamp(cols + tapDir * 2, 21, 601);
-                    else if (focusedSlider == 1) rows   = std::clamp(rows + tapDir * 2, 21, 401);
-                    else                         stepMs = std::clamp(std::round((stepMs + tapDir * 0.1f) * 10.f) / 10.f, 0.1f, 20.0f);
-                }
-
-                // Hold: velocity ramps smoothly from 0 to max over 1.5 s after 250 ms delay
-                if (holdDir != 0) {
-                    float secs = std::max(leftNav.heldSecs(), rightNav.heldSecs());
-                    float ramp = std::clamp((secs - 0.25f) / 1.5f, 0.f, 1.f);
-
-                    if (focusedSlider == 0) {
-                        colFrac += holdDir * ramp * 200.f * dt;
-                        while (colFrac >=  2.f) { cols = std::clamp(cols + 2, 21, 601); colFrac -= 2.f; }
-                        while (colFrac <= -2.f) { cols = std::clamp(cols - 2, 21, 601); colFrac += 2.f; }
-                    } else if (focusedSlider == 1) {
-                        rowFrac += holdDir * ramp * 150.f * dt;
-                        while (rowFrac >=  2.f) { rows = std::clamp(rows + 2, 21, 401); rowFrac -= 2.f; }
-                        while (rowFrac <= -2.f) { rows = std::clamp(rows - 2, 21, 401); rowFrac += 2.f; }
-                    } else {
-                        stepMs = std::clamp(std::round((stepMs + holdDir * ramp * 30.f * dt) * 10.f) / 10.f, 0.1f, 20.0f);
-                    }
-                }
-            }
-
-            // Highlight color for the keyboard-focused slider row
-            const ImVec4 focusBg(0.25f, 0.42f, 0.62f, 1.00f);
-
-            ImGui::Text("Columns"); ImGui::SameLine(uiLabelW);
-            ImGui::SetNextItemWidth(uiSliderW);
-            if (keyboardNav && focusedSlider == 0) ImGui::PushStyleColor(ImGuiCol_FrameBg, focusBg);
-            ImGui::SliderInt("##cols", &cols, 21, 601);
-            if (keyboardNav && focusedSlider == 0) ImGui::PopStyleColor();
-            if (ImGui::IsItemHovered()) { focusedSlider = 0; }
-
-            ImGui::Text("Rows"); ImGui::SameLine(uiLabelW);
-            ImGui::SetNextItemWidth(uiSliderW);
-            if (keyboardNav && focusedSlider == 1) ImGui::PushStyleColor(ImGuiCol_FrameBg, focusBg);
-            ImGui::SliderInt("##rows", &rows, 21, 401);
-            if (keyboardNav && focusedSlider == 1) ImGui::PopStyleColor();
-            if (ImGui::IsItemHovered()) { focusedSlider = 1; }
-
-            ImGui::Text("Speed"); ImGui::SameLine(uiLabelW);
-            ImGui::SetNextItemWidth(uiSliderW);
-            if (keyboardNav && focusedSlider == 2) ImGui::PushStyleColor(ImGuiCol_FrameBg, focusBg);
-            ImGui::SliderFloat("##speed", &stepMs, 0.1f, 20.0f, "%.1f ms/step");
-            if (keyboardNav && focusedSlider == 2) ImGui::PopStyleColor();
-            if (ImGui::IsItemHovered()) { focusedSlider = 2; }
-
-            // Ensure odd values (maze algorithm requires it)
-            if (cols % 2 == 0) cols++;
-            if (rows % 2 == 0) rows++;
-
-            // Preview computed cell size and window resolution
-            {
-                auto desktop = sf::VideoMode::getDesktopMode();
-                int preview = std::max(1, std::min((int)desktop.size.x / cols, ((int)desktop.size.y - taskbarHeight) / rows));
-                ImGui::Spacing();
-                ImGui::TextDisabled("Cell size: %dpx  |  Window: %d x %d", preview, cols * preview, rows * preview);
-            }
-            ImGui::Spacing();
-
-            if (ImGui::Button("Generate", { uiBtnW, uiBtnH }))
-                generate();
-
-            ImGui::End();
-
+            drawSettings();
             window.clear(sf::Color(30, 30, 30));
             ImGui::SFML::Render(window);
             window.display();
             continue;
         }
 
-        // ------------------------------------------------------------------
-        // Running: animate solver - batch steps to stay frame-rate independent
-        // ------------------------------------------------------------------
-        if (phase == Phase::Visiting) {
-            auto currentVisited = solver->getVisited();
-            int steps = std::max(1, (int)(animClock.getElapsedTime().asMilliseconds() / stepMs));
-            bool drew = false;
-            for (int i = 0; i < steps && visitedIndex < currentVisited.size(); ++i) {
-                Cell* c = currentVisited[visitedIndex++];
-                c->shape.setFillColor(sf::Color(150, 200, 255));
-                c->shape.setOutlineColor(sf::Color(150, 200, 255));
-                dynamicLayer.draw(c->shape);
-                drew = true;
-            }
-            if (drew) { dynamicLayer.display(); animClock.restart(); }
-
-            if (visitedIndex >= currentVisited.size() && solver->isFinished() && solver->foundPath()) {
-                pathPtr = solver->getPath();
-                pathIndex = 0;
-                phase = Phase::Path;
-                animClock.restart();
-            }
-            else if (visitedIndex >= currentVisited.size() && solver->isFinished() && !solver->foundPath()) {
-                window.setTitle("Maze Solver - No path found!");
-            }
-        }
-        else if (phase == Phase::Path && pathPtr) {
-            int steps = std::max(1, (int)(animClock.getElapsedTime().asMilliseconds() / stepMs));
-            bool drew = false;
-            for (int i = 0; i < steps && pathIndex < pathPtr->size(); ++i) {
-                Cell* c = (*pathPtr)[pathIndex++];
-                c->shape.setFillColor(sf::Color::Red);
-                c->shape.setOutlineColor(sf::Color::Red);
-                dynamicLayer.draw(c->shape);
-                drew = true;
-            }
-            if (drew) { dynamicLayer.display(); animClock.restart(); }
-            if (pathIndex >= pathPtr->size())
-                window.setTitle("Maze Solver - Done!");
-        }
-
+        stepAnimation();
         window.clear();
         window.draw(*mazeBackground);
         window.draw(*dynamicOverlay);
