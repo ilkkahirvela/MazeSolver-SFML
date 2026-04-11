@@ -21,7 +21,8 @@
  *
  * @section usage_sec Usage
  * Build and run the program. Configure maze size in the settings panel,
- * then click Generate. Press R at any time to open settings and regenerate.
+ * then click Generate. Press R to instantly regenerate with the same settings,
+ * or Esc to return to the settings panel.
  */
 
 /**
@@ -40,9 +41,8 @@ int main() {
     // ---------------------------------------------------------------------
     // Settings (configurable via ImGui panel)
     // ---------------------------------------------------------------------
-    int cols     = 201;
-    int rows     = 151;
-    int cellSize = 5;
+    int cols = 201;
+    int rows = 151;
 
     // ---------------------------------------------------------------------
     // Initial window — sized to settings panel only, resized on generate
@@ -52,6 +52,19 @@ int main() {
         "Maze Solver"
     );
     window.setFramerateLimit(60);
+
+    const int taskbarHeight = 80;
+
+    // Center window on screen, leaving room for the taskbar at the bottom
+    auto centerWindow = [&](int w, int h) {
+        auto desktop = sf::VideoMode::getDesktopMode();
+        int x = ((int)desktop.size.x - w) / 2;
+        int y = ((int)desktop.size.y - taskbarHeight - h) / 2;
+        window.setPosition(sf::Vector2i(std::max(0, x), std::max(0, y)));
+    };
+
+    centerWindow(400, 220);
+
     (void)ImGui::SFML::Init(window);
 
     // ---------------------------------------------------------------------
@@ -85,6 +98,12 @@ int main() {
     auto generate = [&]() {
         if (solver) { solver->join(); solver.reset(); }
 
+        auto desktop = sf::VideoMode::getDesktopMode();
+        const int cellSize = std::max(1, std::min(
+            (int)desktop.size.x / cols,
+            ((int)desktop.size.y - taskbarHeight) / rows
+        ));
+
         maze = std::make_unique<Maze>(cols, rows, cellSize);
         maze->generate();
 
@@ -113,6 +132,7 @@ int main() {
 
         window.setSize({ w, h });
         window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { (float)w, (float)h })));
+        centerWindow((int)w, (int)h);
 
         state = AppState::Running;
     };
@@ -128,10 +148,15 @@ int main() {
                 window.close();
 
             if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-                if (key->code == sf::Keyboard::Key::R && state == AppState::Running) {
-                    window.setSize({ 400, 220 });
-                    window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { 400.f, 220.f })));
-                    state = AppState::Settings;
+                if (state == AppState::Running) {
+                    if (key->code == sf::Keyboard::Key::R)
+                        generate();
+                    else if (key->code == sf::Keyboard::Key::Escape) {
+                        window.setSize({ 400, 220 });
+                        window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { 400.f, 220.f })));
+                        centerWindow(400, 220);
+                        state = AppState::Settings;
+                    }
                 }
             }
         }
@@ -160,16 +185,17 @@ int main() {
             ImGui::SetNextItemWidth(200);
             ImGui::SliderInt("##rows", &rows, 21, 401);
 
-            ImGui::Text("Cell size"); ImGui::SameLine(120);
-            ImGui::SetNextItemWidth(200);
-            ImGui::SliderInt("##cell", &cellSize, 2, 12);
-
             // Ensure odd values (maze algorithm requires it)
             if (cols % 2 == 0) cols++;
             if (rows % 2 == 0) rows++;
 
-            ImGui::Spacing();
-            ImGui::Text("Window: %d x %d px", cols * cellSize, rows * cellSize);
+            // Preview computed cell size and window resolution
+            {
+                auto desktop = sf::VideoMode::getDesktopMode();
+                int preview = std::max(1, std::min((int)desktop.size.x / cols, ((int)desktop.size.y - taskbarHeight) / rows));
+                ImGui::Spacing();
+                ImGui::TextDisabled("Cell size: %dpx  |  Window: %d x %d", preview, cols * preview, rows * preview);
+            }
             ImGui::Spacing();
 
             if (ImGui::Button("Generate", { 120, 32 }))

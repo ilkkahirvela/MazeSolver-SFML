@@ -4,10 +4,11 @@
 Cell::Cell(int x, int y, int size, bool blocked)
     : x(x), y(y), isBlocked(blocked)
 {
-    // Rectangle size with small spacing (grid lines)
-    shape.setSize(sf::Vector2f((float)size - 2, (float)size - 2));
-    shape.setPosition(sf::Vector2f((float)(x * size + 1), (float)(y * size + 1)));
-    shape.setOutlineThickness(1.0f);
+    // At small cell sizes drop the gap and outline — shape would be 0x0 otherwise
+    float inset = (size >= 4) ? 1.f : 0.f;
+    shape.setSize(sf::Vector2f(size - 2 * inset, size - 2 * inset));
+    shape.setPosition(sf::Vector2f(x * size + inset, y * size + inset));
+    shape.setOutlineThickness(inset);
     shape.setOutlineColor(sf::Color(200, 200, 200)); // light gray grid
     setBlocked(blocked);
 }
