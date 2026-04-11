@@ -48,8 +48,8 @@ int main() {
     // Initial window — sized to settings panel only, resized on generate
     // ---------------------------------------------------------------------
     sf::RenderWindow window(
-        sf::VideoMode({ 400, 220 }),
-        "Maze Solver"
+        sf::VideoMode({ 400, 245 }),
+        "Maze Solver - Settings"
     );
     window.setFramerateLimit(60);
 
@@ -63,7 +63,7 @@ int main() {
         window.setPosition(sf::Vector2i(std::max(0, x), std::max(0, y)));
     };
 
-    centerWindow(400, 220);
+    centerWindow(400, 245);
 
     (void)ImGui::SFML::Init(window);
 
@@ -82,7 +82,7 @@ int main() {
     std::optional<sf::Sprite>    dynamicOverlay;
 
     sf::Clock animClock;
-    const float stepMs = 0.5f;
+    float stepMs = 0.5f;
     std::size_t visitedIndex = 0;
     std::size_t pathIndex    = 0;
     std::shared_ptr<const std::vector<Cell*>> pathPtr;
@@ -129,6 +129,7 @@ int main() {
 
         solver = std::make_unique<Solver>(*maze);
         solver->start();
+        window.setTitle("Maze Solver - Solving...");
 
         window.setSize({ w, h });
         window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { (float)w, (float)h })));
@@ -148,13 +149,18 @@ int main() {
                 window.close();
 
             if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-                if (state == AppState::Running) {
+                if (state == AppState::Settings) {
+                    if (key->code == sf::Keyboard::Key::Enter)
+                        generate();
+                }
+                else if (state == AppState::Running) {
                     if (key->code == sf::Keyboard::Key::R)
                         generate();
                     else if (key->code == sf::Keyboard::Key::Escape) {
-                        window.setSize({ 400, 220 });
-                        window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { 400.f, 220.f })));
-                        centerWindow(400, 220);
+                        window.setSize({ 400, 245 });
+                        window.setView(sf::View(sf::FloatRect({ 0.f, 0.f }, { 400.f, 245.f })));
+                        centerWindow(400, 245);
+                        window.setTitle("Maze Solver - Settings");
                         state = AppState::Settings;
                     }
                 }
@@ -168,7 +174,7 @@ int main() {
         // ------------------------------------------------------------------
         if (state == AppState::Settings) {
             ImGui::SetNextWindowPos({ 0, 0 });
-            ImGui::SetNextWindowSize({ 400, 220 });
+            ImGui::SetNextWindowSize({ 400, 245 });
             ImGui::Begin("Maze Settings", nullptr,
                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
@@ -184,6 +190,10 @@ int main() {
             ImGui::Text("Rows"); ImGui::SameLine(120);
             ImGui::SetNextItemWidth(200);
             ImGui::SliderInt("##rows", &rows, 21, 401);
+
+            ImGui::Text("Speed"); ImGui::SameLine(120);
+            ImGui::SetNextItemWidth(200);
+            ImGui::SliderFloat("##speed", &stepMs, 0.1f, 20.0f, "%.1f ms/step");
 
             // Ensure odd values (maze algorithm requires it)
             if (cols % 2 == 0) cols++;
@@ -231,6 +241,9 @@ int main() {
                 phase = Phase::Path;
                 animClock.restart();
             }
+            else if (visitedIndex >= currentVisited.size() && solver->isFinished() && !solver->foundPath()) {
+                window.setTitle("Maze Solver - No path found!");
+            }
         }
         else if (phase == Phase::Path && pathPtr) {
             int steps = std::max(1, (int)(animClock.getElapsedTime().asMilliseconds() / stepMs));
@@ -243,6 +256,8 @@ int main() {
                 drew = true;
             }
             if (drew) { dynamicLayer.display(); animClock.restart(); }
+            if (pathIndex >= pathPtr->size())
+                window.setTitle("Maze Solver - Done!");
         }
 
         window.clear();
