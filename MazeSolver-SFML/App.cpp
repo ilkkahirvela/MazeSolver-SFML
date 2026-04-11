@@ -200,6 +200,32 @@ int main() {
     sf::Clock deltaClock; // for ImGui::SFML::Update
 
     // ---------------------------------------------------------------------
+    // Keyboard navigation state (settings panel)
+    // ---------------------------------------------------------------------
+    int  focusedSlider = 0;    // 0 = Columns, 1 = Rows, 2 = Speed
+    bool keyboardNav   = false; // true while keyboard is the active input device
+
+    // Tracks press and hold state for smooth velocity-based navigation.
+    struct NavKey {
+        bool      wasDown    = false;
+        bool      justPressed = false; // true for one frame on initial press
+        sf::Clock held;
+        void update(sf::Keyboard::Key key) {
+            justPressed = false;
+            bool down = sf::Keyboard::isKeyPressed(key);
+            if (!down) { wasDown = false; return; }
+            if (!wasDown) { wasDown = true; justPressed = true; held.restart(); }
+        }
+        float heldSecs() const {
+            return wasDown ? held.getElapsedTime().asSeconds() : 0.f;
+        }
+    } leftNav, rightNav;
+
+    sf::Clock navClock;       // frame delta for velocity integration
+    float     colFrac = 0.f;  // fractional column accumulator
+    float     rowFrac = 0.f;  // fractional row accumulator
+
+    // ---------------------------------------------------------------------
     // Lambda: start a new maze with current settings
     // ---------------------------------------------------------------------
     auto generate = [&]() {
@@ -255,10 +281,21 @@ int main() {
             if (event->is<sf::Event::Closed>())
                 window.close();
 
+            if (event->is<sf::Event::MouseMoved>())
+                keyboardNav = false;
+
             if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
                 if (state == AppState::Settings) {
                     if (key->code == sf::Keyboard::Key::Enter)
                         generate();
+                    else if (key->code == sf::Keyboard::Key::Up) {
+                        focusedSlider = std::max(0, focusedSlider - 1);
+                        keyboardNav = true;
+                    }
+                    else if (key->code == sf::Keyboard::Key::Down) {
+                        focusedSlider = std::min(2, focusedSlider + 1);
+                        keyboardNav = true;
+                    }
                 }
                 else if (state == AppState::Running) {
                     if (key->code == sf::Keyboard::Key::R)
@@ -291,17 +328,69 @@ int main() {
             ImGui::Separator();
             ImGui::Spacing();
 
+            // Velocity-based keyboard navigation for left/right
+            {
+                float dt = navClock.restart().asSeconds();
+                leftNav.update(sf::Keyboard::Key::Left);
+                rightNav.update(sf::Keyboard::Key::Right);
+
+                if (leftNav.justPressed || rightNav.justPressed) keyboardNav = true;
+
+                int tapDir  = (rightNav.justPressed ? 1 : 0) - (leftNav.justPressed ? 1 : 0);
+                int holdDir = (!rightNav.justPressed && rightNav.wasDown ? 1 : 0)
+                            - (!leftNav.justPressed  && leftNav.wasDown  ? 1 : 0);
+
+                if (holdDir == 0) { colFrac = rowFrac = 0.f; }
+
+                // Single tap: minimum step
+                if (tapDir != 0) {
+                    if      (focusedSlider == 0) cols   = std::clamp(cols + tapDir * 2, 21, 601);
+                    else if (focusedSlider == 1) rows   = std::clamp(rows + tapDir * 2, 21, 401);
+                    else                         stepMs = std::clamp(std::round((stepMs + tapDir * 0.1f) * 10.f) / 10.f, 0.1f, 20.0f);
+                }
+
+                // Hold: velocity ramps smoothly from 0 to max over 1.5 s after 250 ms delay
+                if (holdDir != 0) {
+                    float secs = std::max(leftNav.heldSecs(), rightNav.heldSecs());
+                    float ramp = std::clamp((secs - 0.25f) / 1.5f, 0.f, 1.f);
+
+                    if (focusedSlider == 0) {
+                        colFrac += holdDir * ramp * 200.f * dt;
+                        while (colFrac >=  2.f) { cols = std::clamp(cols + 2, 21, 601); colFrac -= 2.f; }
+                        while (colFrac <= -2.f) { cols = std::clamp(cols - 2, 21, 601); colFrac += 2.f; }
+                    } else if (focusedSlider == 1) {
+                        rowFrac += holdDir * ramp * 150.f * dt;
+                        while (rowFrac >=  2.f) { rows = std::clamp(rows + 2, 21, 401); rowFrac -= 2.f; }
+                        while (rowFrac <= -2.f) { rows = std::clamp(rows - 2, 21, 401); rowFrac += 2.f; }
+                    } else {
+                        stepMs = std::clamp(std::round((stepMs + holdDir * ramp * 30.f * dt) * 10.f) / 10.f, 0.1f, 20.0f);
+                    }
+                }
+            }
+
+            // Highlight color for the keyboard-focused slider row
+            const ImVec4 focusBg(0.25f, 0.42f, 0.62f, 1.00f);
+
             ImGui::Text("Columns"); ImGui::SameLine(uiLabelW);
             ImGui::SetNextItemWidth(uiSliderW);
+            if (keyboardNav && focusedSlider == 0) ImGui::PushStyleColor(ImGuiCol_FrameBg, focusBg);
             ImGui::SliderInt("##cols", &cols, 21, 601);
+            if (keyboardNav && focusedSlider == 0) ImGui::PopStyleColor();
+            if (ImGui::IsItemHovered()) { focusedSlider = 0; }
 
             ImGui::Text("Rows"); ImGui::SameLine(uiLabelW);
             ImGui::SetNextItemWidth(uiSliderW);
+            if (keyboardNav && focusedSlider == 1) ImGui::PushStyleColor(ImGuiCol_FrameBg, focusBg);
             ImGui::SliderInt("##rows", &rows, 21, 401);
+            if (keyboardNav && focusedSlider == 1) ImGui::PopStyleColor();
+            if (ImGui::IsItemHovered()) { focusedSlider = 1; }
 
             ImGui::Text("Speed"); ImGui::SameLine(uiLabelW);
             ImGui::SetNextItemWidth(uiSliderW);
+            if (keyboardNav && focusedSlider == 2) ImGui::PushStyleColor(ImGuiCol_FrameBg, focusBg);
             ImGui::SliderFloat("##speed", &stepMs, 0.1f, 20.0f, "%.1f ms/step");
+            if (keyboardNav && focusedSlider == 2) ImGui::PopStyleColor();
+            if (ImGui::IsItemHovered()) { focusedSlider = 2; }
 
             // Ensure odd values (maze algorithm requires it)
             if (cols % 2 == 0) cols++;
