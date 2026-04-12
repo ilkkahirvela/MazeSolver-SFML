@@ -27,9 +27,10 @@ var NAVTREE =
   [ "Maze Solver Visualization", "index.html", [
     [ "Introduction", "index.html#intro_sec", null ],
     [ "Algorithms", "index.html#algo_sec", null ],
+    [ "Architecture", "index.html#arch_sec", null ],
     [ "Visualization", "index.html#viz_sec", null ],
     [ "Dependencies", "index.html#deps_sec", null ],
-    [ "Usage", "index.html#usage_sec", null ],
+    [ "Building", "index.html#build_sec", null ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],

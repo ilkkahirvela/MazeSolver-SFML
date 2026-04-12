@@ -7,22 +7,33 @@
  *
  * @section algo_sec Algorithms
  * - Maze generation: Recursive Backtracking (Depth-First Search)
- * - Maze solving: Breadth-First Search (BFS)
+ * - Maze solving: Breadth-First Search (BFS) - guarantees the shortest path
+ *
+ * @section arch_sec Architecture
+ * The project is split into four components:
+ * - @ref Cell - a single grid cell storing its position, blocked state, and SFML shape
+ * - @ref Maze - owns the Cell grid, handles generation and drawing
+ * - @ref Solver - runs BFS in a background thread, exposes visited cells and the final path
+ * - App.cpp - application entry point, manages the window, ImGui settings panel, and animation loop
+ *
+ * Solver runs on a separate thread and communicates with the main thread through
+ * a mutex-protected shared state. The main thread polls for updates each frame.
  *
  * @section viz_sec Visualization
- * - Maze walls are drawn once into a static layer.
- * - Visited cells are shown in light blue as the solver explores.
- * - The final shortest path is shown in red once discovered.
+ * - Maze walls are drawn once into a static RenderTexture layer.
+ * - Visited cells and the final path are drawn incrementally into a dynamic layer.
+ * - Both layers are composited each frame for smooth, flicker-free rendering.
  *
  * @section deps_sec Dependencies
  * - C++17 or newer
  * - SFML 3.0+ (graphics, window, system)
- * - Dear ImGui + ImGui-SFML (settings UI)
+ * - Dear ImGui v1.91.9 + ImGui-SFML (vendored in MazeSolver-SFML/vendor/)
  *
- * @section usage_sec Usage
- * Build and run the program. Configure maze size in the settings panel,
- * then click Generate. Press R to instantly regenerate with the same settings,
- * or Esc to return to the settings panel.
+ * @section build_sec Building
+ * The project uses a Visual Studio 2022 solution (MazeSolver-SFML.sln).
+ * SFML 3.0 must be installed separately and the include/library paths in
+ * MazeSolver-SFML.vcxproj updated to match the local installation.
+ * ImGui and ImGui-SFML are vendored and require no separate setup.
  */
 
 /**

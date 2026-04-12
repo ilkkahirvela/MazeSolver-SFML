@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['maze_20solver_20visualization_0',['Maze Solver Visualization',['../index.html',1,'']]]
+  ['introduction_0',['Introduction',['../index.html#intro_sec',1,'']]]
 ];

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['join_0',['join',['../class_solver.html#aadf4e2c4ab497297720ff8796d37d8c6',1,'Solver']]],
-  ['justpressed_1',['justPressed',['../struct_nav_key.html#a8ee7c593a1fa275cc2a7d9f61b185e90',1,'NavKey']]]
+  ['introduction_0',['Introduction',['../index.html#intro_sec',1,'']]],
+  ['isblocked_1',['isBlocked',['../class_cell.html#a52a5cee3909c2f1f2f905cdde8ea8855',1,'Cell']]],
+  ['isfinished_2',['isFinished',['../class_solver.html#a8f024ca4553f8102f72791849a52ba12',1,'Solver']]]
 ];

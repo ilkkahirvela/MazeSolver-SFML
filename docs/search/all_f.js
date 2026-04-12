@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['visualization_0',['Visualization',['../index.html',1,'Maze Solver Visualization'],['../index.html#viz_sec',1,'Visualization']]]
+  ['update_0',['update',['../struct_nav_key.html#a0b49ab08d33a372a6bd2f3d990cdffbd',1,'NavKey']]]
 ];

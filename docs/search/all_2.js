@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['dependencies_0',['Dependencies',['../index.html#deps_sec',1,'']]],
-  ['draw_1',['draw',['../class_cell.html#aebb6235ff56364cf5568af5e47f440c6',1,'Cell::draw()'],['../class_maze.html#aca702a435fc5b61d9b33bde0c09ba312',1,'Maze::draw()']]]
+  ['cell_0',['Cell',['../class_cell.html',1,'Cell'],['../class_cell.html#ab8e3c58af30b3bb2d025b7ddbabfddcf',1,'Cell::Cell()']]]
 ];

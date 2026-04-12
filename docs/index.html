@@ -99,25 +99,34 @@ Introduction</h1>
 Algorithms</h1>
 <ul>
 <li>Maze generation: Recursive Backtracking (Depth-First Search)</li>
-<li>Maze solving: Breadth-First Search (BFS)</li>
+<li>Maze solving: Breadth-First Search (BFS) - guarantees the shortest path</li>
 </ul>
+<h1 class="doxsection"><a class="anchor" id="arch_sec"></a>
+Architecture</h1>
+<p>The project is split into four components:</p><ul>
+<li><a class="el" href="class_cell.html">Cell</a> - a single grid cell storing its position, blocked state, and SFML shape</li>
+<li><a class="el" href="class_maze.html">Maze</a> - owns the Cell grid, handles generation and drawing</li>
+<li><a class="el" href="class_solver.html">Solver</a> - runs BFS in a background thread, exposes visited cells and the final path</li>
+<li>App.cpp - application entry point, manages the window, ImGui settings panel, and animation loop</li>
+</ul>
+<p>Solver runs on a separate thread and communicates with the main thread through a mutex-protected shared state. The main thread polls for updates each frame.</p>
 <h1 class="doxsection"><a class="anchor" id="viz_sec"></a>
 Visualization</h1>
 <ul>
-<li>Maze walls are drawn once into a static layer.</li>
-<li>Visited cells are shown in light blue as the solver explores.</li>
-<li>The final shortest path is shown in red once discovered.</li>
+<li>Maze walls are drawn once into a static RenderTexture layer.</li>
+<li>Visited cells and the final path are drawn incrementally into a dynamic layer.</li>
+<li>Both layers are composited each frame for smooth, flicker-free rendering.</li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="deps_sec"></a>
 Dependencies</h1>
 <ul>
 <li>C++17 or newer</li>
 <li>SFML 3.0+ (graphics, window, system)</li>
-<li>Dear ImGui + ImGui-SFML (settings UI)</li>
+<li>Dear ImGui v1.91.9 + ImGui-SFML (vendored in MazeSolver-SFML/vendor/)</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="usage_sec"></a>
-Usage</h1>
-<p>Build and run the program. Configure maze size in the settings panel, then click Generate. Press R to instantly regenerate with the same settings, or Esc to return to the settings panel. </p>
+<h1 class="doxsection"><a class="anchor" id="build_sec"></a>
+Building</h1>
+<p>The project uses a Visual Studio 2022 solution (MazeSolver-SFML.sln). SFML 3.0 must be installed separately and the include/library paths in MazeSolver-SFML.vcxproj updated to match the local installation. ImGui and ImGui-SFML are vendored and require no separate setup. </p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->
