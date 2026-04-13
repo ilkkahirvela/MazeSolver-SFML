@@ -48,3 +48,7 @@ See [Releases](https://github.com/ilkkahirvela/MazeSolver-SFML/releases) for a p
 - C++17
 - [SFML 3.0](https://www.sfml-dev.org/)
 - [Dear ImGui](https://github.com/ocornut/imgui) + [ImGui-SFML](https://github.com/SFML/imgui-sfml)
+
+## License
+
+MIT - see [LICENSE](LICENSE) for details.
